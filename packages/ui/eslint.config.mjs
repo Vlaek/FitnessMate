@@ -1,4 +1,4 @@
-import { config } from "@repo/eslint-config/react-internal";
+import baseConfig from '@repo/eslint-config/base';
+import { defineConfig } from 'eslint/config';
 
-/** @type {import("eslint").Linter.Config} */
-export default config;
+export default defineConfig([baseConfig, { rules: { 'react-refresh/only-export-components': 0 } }]);

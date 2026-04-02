@@ -1,0 +1,11 @@
+{
+  "name": "@repo/prettier-config",
+  "type": "module",
+  "exports": {
+    ".": "./prettier.config.mjs"
+  },
+  "dependencies": {
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.7.2"
+  }
+}

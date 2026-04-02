@@ -1,0 +1,4 @@
+{
+  "extends": ["@repo/typescript-config/node"],
+  "include": ["next.config.js"]
+}
