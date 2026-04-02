@@ -1,6 +1,6 @@
 export class TelegramService {
   private static TELEGRAM_TOKEN_KEY = 'telegram_token';
-  
+
   static saveToken(token: string): void {
     localStorage.setItem(this.TELEGRAM_TOKEN_KEY, token);
   }
@@ -15,7 +15,7 @@ export class TelegramService {
 
   static async sendMessage(message: string, chatId: string): Promise<boolean> {
     const token = this.getToken();
-    
+
     if (!token) {
       throw new Error('Telegram token is not set');
     }

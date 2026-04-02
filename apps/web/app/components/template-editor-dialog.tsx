@@ -1,18 +1,20 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@repo/ui/components/dialog';
 import { Button } from '@repo/ui/components/button';
-import { Input } from '@repo/ui/components/index';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
+import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import { Textarea } from '@repo/ui/components/textarea';
+import { Exercise } from '../interfaces/exercise';
 import { WorkoutTemplate } from '../interfaces/workout-template';
 
 interface TemplateEditorDialogProps {
   isOpen: boolean;
   onClose: () => void;
   currentTemplate: WorkoutTemplate | null;
-  setCurrentTemplate: (template: WorkoutTemplate | null) => void;
+  setCurrentTemplate: (template: WorkoutTemplate) => void;
   handleSaveTemplate: () => void;
+  t: (key: string) => string;
 }
 
 export function TemplateEditorDialog({
@@ -20,146 +22,173 @@ export function TemplateEditorDialog({
   onClose,
   currentTemplate,
   setCurrentTemplate,
-  handleSaveTemplate
+  handleSaveTemplate,
+  t,
 }: TemplateEditorDialogProps) {
-  if (!currentTemplate) return null;
+  const updateTemplateField = (field: keyof WorkoutTemplate, value: string | Exercise[]) => {
+    if (!currentTemplate) return;
+
+    setCurrentTemplate({
+      ...currentTemplate,
+      [field]: value,
+    });
+  };
+
+  const updateExerciseInTemplate = (
+    index: number,
+    field: keyof Exercise,
+    value: string | number,
+  ) => {
+    if (!currentTemplate) return;
+
+    const updatedExercises = [...currentTemplate.exercises];
+    updatedExercises[index] = { ...updatedExercises[index], [field]: value };
+    updateTemplateField('exercises', updatedExercises);
+  };
+
+  const addExerciseToTemplate = () => {
+    if (!currentTemplate) return;
+
+    const newExercise: Exercise = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: '',
+      sets: 3,
+      weight: 0,
+    };
+
+    updateTemplateField('exercises', [...currentTemplate.exercises, newExercise]);
+  };
+
+  const removeExerciseFromTemplate = (index: number) => {
+    if (!currentTemplate || currentTemplate.exercises.length <= 1) return;
+
+    const updatedExercises = [...currentTemplate.exercises];
+    updatedExercises.splice(index, 1);
+    updateTemplateField('exercises', updatedExercises);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl">
-        <DialogHeader 
-          className="bg-teal-600 rounded-t-xl p-5 -m-6 mb-6" 
-          style={{ borderRadius: '0.5rem 0.5rem 0 0' }} // Custom styling to match previous header
-        >
-          <DialogTitle className="text-2xl font-bold text-white">
-            {currentTemplate.id ? 'Edit Template' : 'New Template'}
-          </DialogTitle>
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto sm:max-w-md lg:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{currentTemplate?.id ? t('edit') : t('newTemplate')}</DialogTitle>
         </DialogHeader>
-        
-        <div className="mb-6">
-          <Label htmlFor="template-name" className="text-slate-700">Template Name *</Label>
-          <Input
-            id="template-name"
-            value={currentTemplate.name}
-            onChange={(e) => setCurrentTemplate({...currentTemplate, name: e.target.value})}
-            placeholder="Enter template name"
-            className="mt-1 p-3 border border-slate-300 rounded-lg w-full"
-          />
-        </div>
-        
-        <div className="mb-6">
-          <Label htmlFor="template-desc" className="text-slate-700">Description</Label>
-          <Textarea
-            id="template-desc"
-            value={currentTemplate.description}
-            onChange={(e) => setCurrentTemplate({...currentTemplate, description: e.target.value})}
-            placeholder="Describe your template"
-            className="mt-1 p-3 border border-slate-300 rounded-lg w-full min-h-25"
-          />
-        </div>
-        
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <Label className="text-slate-700 text-lg">Exercises</Label>
-            <Button 
-              type="button" 
-              size="sm" 
-              variant="outline" 
-              onClick={() => {
-                const updatedTemplate = {...currentTemplate};
-                updatedTemplate.exercises = [
-                  ...updatedTemplate.exercises,
-                  { id: Math.random().toString(36).substr(2, 9), name: '', sets: 3, weight: 0 }
-                ];
-                setCurrentTemplate(updatedTemplate);
-              }}
-              className="border-slate-300 text-slate-700"
-            >
-              Add Exercise
-            </Button>
-          </div>
-          
-          {currentTemplate.exercises.map((exercise, index) => (
-            <div key={index} className="grid grid-cols-12 gap-3 mb-4 items-center p-3 bg-slate-50 rounded-lg">
-              <div className="col-span-5">
-                <Input
-                  value={exercise.name}
-                  onChange={(e) => {
-                    const updatedTemplate = {...currentTemplate};
-                    if (updatedTemplate.exercises[index]) {
-                      updatedTemplate.exercises[index].name = e.target.value;
-                    }
-                    setCurrentTemplate(updatedTemplate);
-                  }}
-                  placeholder="Exercise name"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-3">
-                <Input
-                  type="number"
-                  value={exercise.sets}
-                  onChange={(e) => {
-                    const updatedTemplate = {...currentTemplate};
-                    if (updatedTemplate.exercises[index]) {
-                      updatedTemplate.exercises[index].sets = parseInt(e.target.value) || 0;
-                    }
-                    setCurrentTemplate(updatedTemplate);
-                  }}
-                  placeholder="Sets"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-3">
-                <Input
-                  type="number"
-                  value={exercise.weight}
-                  onChange={(e) => {
-                    const updatedTemplate = {...currentTemplate};
-                    if (updatedTemplate.exercises[index]) {
-                      updatedTemplate.exercises[index].weight = parseFloat(e.target.value) || 0;
-                    }
-                    setCurrentTemplate(updatedTemplate);
-                  }}
-                  placeholder="Default weight (kg)"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-1">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => {
-                    const updatedTemplate = {...currentTemplate};
-                    updatedTemplate.exercises.splice(index, 1);
-                    setCurrentTemplate(updatedTemplate);
-                  }}
-                  disabled={currentTemplate.exercises.length <= 1}
-                  className="w-full h-10 flex items-center justify-center border-slate-300 text-slate-600 hover:bg-red-50 hover:text-red-600"
+
+        {currentTemplate && (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="template-name">{t('workoutTemplates')}</Label>
+              <Input
+                id="template-name"
+                value={currentTemplate.name}
+                onChange={(e) => updateTemplateField('name', e.target.value)}
+                placeholder={t('enterTemplateName')}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="template-description">{t('workoutDescription')}</Label>
+              <Textarea
+                id="template-description"
+                value={currentTemplate.description || ''}
+                onChange={(e) => updateTemplateField('description', e.target.value)}
+                placeholder={t('enterTemplateDescription')}
+                className="mt-1 min-h-25"
+              />
+            </div>
+
+            <div className="mt-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">{t('exercises')}</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addExerciseToTemplate}
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
                 >
-                  ×
+                  {t('addExercise')}
                 </Button>
               </div>
+
+              <div className="mt-4 space-y-4">
+                {currentTemplate.exercises.map((exercise, index) => (
+                  <div
+                    key={exercise.id || index}
+                    className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4"
+                  >
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div>
+                        <Label htmlFor={`exercise-name-${index}`}>{t('exerciseName')}</Label>
+                        <Input
+                          id={`exercise-name-${index}`}
+                          value={exercise.name}
+                          onChange={(e) => updateExerciseInTemplate(index, 'name', e.target.value)}
+                          placeholder={t('enterExerciseName')}
+                        />
+                      </div>
+
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <Label htmlFor={`sets-${index}`}>{t('sets')}</Label>
+                          <Input
+                            id={`sets-${index}`}
+                            type="number"
+                            value={exercise.sets}
+                            onChange={(e) =>
+                              updateExerciseInTemplate(index, 'sets', parseInt(e.target.value))
+                            }
+                            min="1"
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <Label htmlFor={`weight-${index}`}>{t('weight')}</Label>
+                          <Input
+                            id={`weight-${index}`}
+                            type="number"
+                            value={exercise.weight}
+                            onChange={(e) =>
+                              updateExerciseInTemplate(index, 'weight', parseInt(e.target.value))
+                            }
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => removeExerciseFromTemplate(index)}
+                        className="text-xs"
+                      >
+                        {t('delete')}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-        
-        <DialogFooter className="pt-4 border-t border-slate-200">
-          <Button 
-            variant="outline" 
-            onClick={onClose}
-            className="border-slate-300 text-slate-700 px-6 py-2"
-          >
-            Cancel
-          </Button>
-          <Button 
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
             onClick={handleSaveTemplate}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2"
+            className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
           >
-            Save Template
+            {t('saveTemplate')}
           </Button>
-        </DialogFooter>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
+          >
+            {t('cancel')}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

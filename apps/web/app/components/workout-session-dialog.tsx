@@ -1,17 +1,17 @@
 'use client';
 
 import { Button } from '@repo/ui/components/button';
-import { Checkbox } from '@repo/ui/components/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
-import { Input } from '@repo/ui/components/index';
+import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import { Textarea } from '@repo/ui/components/textarea';
 import { Exercise } from '../interfaces/exercise';
+import { WorkoutTemplate } from '../interfaces/workout-template';
 
 interface WorkoutSessionDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  activeWorkout: any;
+  activeWorkout: WorkoutTemplate | null;
   workoutExercises: Exercise[];
   workoutDescription: string;
   useWeekdayPrefix: boolean;
@@ -22,6 +22,7 @@ interface WorkoutSessionDialogProps {
   removeExercise: (index: number) => void;
   handleEndWorkout: () => void;
   getWeekdayName: () => string;
+  t: (key: string) => string;
 }
 
 export function WorkoutSessionDialog({
@@ -38,118 +39,131 @@ export function WorkoutSessionDialog({
   removeExercise,
   handleEndWorkout,
   getWeekdayName,
+  t,
 }: WorkoutSessionDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border border-slate-200 shadow-2xl">
-        <DialogHeader
-          className="-m-6 mb-6 rounded-t-xl bg-blue-600 p-5"
-          style={{ borderRadius: '0.5rem 0.5rem 0 0' }}
-        >
-          <DialogTitle className="text-2xl font-bold text-white">
-            Workout: {activeWorkout?.name}
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto sm:max-w-md lg:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {t('workoutSession')}: {activeWorkout?.name}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="mb-6">
-          <Label className="text-slate-700">Description</Label>
-          <Textarea
-            value={workoutDescription}
-            onChange={(e) => setWorkoutDescription(e.target.value)}
-            placeholder="How did your workout go?"
-            className="mt-1 min-h-25 w-full rounded-lg border border-slate-300 p-3"
-          />
-        </div>
-
-        <div className="mb-6 flex items-center rounded-lg bg-blue-50 p-4">
-          <Checkbox
-            id="weekday-prefix"
-            checked={useWeekdayPrefix}
-            onCheckedChange={(checked) => setUseWeekdayPrefix(!!checked)}
-          />
-          <Label htmlFor="weekday-prefix" className="ml-2 text-slate-700">
-            Include weekday in post title ({getWeekdayName()})
-          </Label>
-        </div>
-
-        <div className="mb-8">
-          <div className="mb-4 flex items-center justify-between">
-            <Label className="text-lg text-slate-700">Exercises</Label>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={addExercise}
-              className="border-slate-300 text-slate-700"
-            >
-              Add Exercise
-            </Button>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="workout-description">{t('workoutDescription')}</Label>
+            <Textarea
+              id="workout-description"
+              value={workoutDescription}
+              onChange={(e) => setWorkoutDescription(e.target.value)}
+              placeholder={t('describeYourWorkout')}
+              className="mt-1 min-h-25"
+            />
           </div>
 
-          {workoutExercises.map((exercise, index) => (
-            <div
-              key={index}
-              className="mb-4 grid grid-cols-12 items-center gap-3 rounded-lg bg-slate-50 p-3"
-            >
-              <div className="col-span-5">
-                <Input
-                  value={exercise.name}
-                  onChange={(e) => updateExerciseField(index, 'name', e.target.value)}
-                  placeholder="Exercise name"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-3">
-                <Input
-                  type="number"
-                  value={exercise.sets}
-                  onChange={(e) =>
-                    updateExerciseField(index, 'sets', parseInt(e.target.value) || 0)
-                  }
-                  placeholder="Sets"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-3">
-                <Input
-                  type="number"
-                  value={exercise.weight}
-                  onChange={(e) =>
-                    updateExerciseField(index, 'weight', parseFloat(e.target.value) || 0)
-                  }
-                  placeholder="Weight (kg)"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeExercise(index)}
-                  disabled={workoutExercises.length <= 1}
-                  className="flex h-10 w-full items-center justify-center border-slate-300 text-slate-600 hover:bg-red-50 hover:text-red-600"
-                >
-                  ×
-                </Button>
-              </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="use-weekday-prefix"
+              checked={useWeekdayPrefix}
+              onChange={(e) => setUseWeekdayPrefix(e.target.checked)}
+              className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="use-weekday-prefix">
+              {t('addWeekdayPrefix')} ({getWeekdayName()})
+            </Label>
+          </div>
+
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium">{t('exercises')}</h3>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addExercise}
+                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                {t('addExercise')}
+              </Button>
             </div>
-          ))}
+
+            <div className="mt-4 space-y-4">
+              {workoutExercises.map((exercise, index) => (
+                <div
+                  key={exercise.id}
+                  className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4"
+                >
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <Label htmlFor={`exercise-name-${index}`}>{t('exerciseName')}</Label>
+                      <Input
+                        id={`exercise-name-${index}`}
+                        value={exercise.name}
+                        onChange={(e) => updateExerciseField(index, 'name', e.target.value)}
+                        placeholder={t('enterExerciseName')}
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <Label htmlFor={`sets-${index}`}>{t('sets')}</Label>
+                        <Input
+                          id={`sets-${index}`}
+                          type="number"
+                          value={exercise.sets}
+                          onChange={(e) =>
+                            updateExerciseField(index, 'sets', parseInt(e.target.value))
+                          }
+                          min="1"
+                        />
+                      </div>
+
+                      <div className="flex-1">
+                        <Label htmlFor={`weight-${index}`}>{t('weight')}</Label>
+                        <Input
+                          id={`weight-${index}`}
+                          type="number"
+                          value={exercise.weight}
+                          onChange={(e) =>
+                            updateExerciseField(index, 'weight', parseInt(e.target.value))
+                          }
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => removeExercise(index)}
+                      disabled={workoutExercises.length <= 1}
+                      className="text-xs"
+                    >
+                      {t('delete')}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            onClick={handleEndWorkout}
+            className="flex-1 bg-green-600 text-white hover:bg-green-700"
+          >
+            {t('sendReport')}
+          </Button>
           <Button
             variant="outline"
             onClick={onClose}
-            className="border-slate-300 px-6 py-2 text-slate-700"
+            className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
           >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleEndWorkout}
-            className="bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
-          >
-            Finish & Send Report
+            {t('endWorkout')}
           </Button>
         </div>
       </DialogContent>
