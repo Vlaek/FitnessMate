@@ -12,6 +12,7 @@
   "tokenIsConfigured": "✓ Token ist konfiguriert",
   "tokenNotConfigured": "○ Token nicht konfiguriert",
   "workoutTemplates": "Workout-Vorlagen",
+  "workoutName": "Workout Name",
   "createAndManageWorkoutTemplates": "Erstellen und verwalten Sie Workout-Vorlagen",
   "addNewTemplate": "Neue Vorlage hinzufügen",
   "noTemplatesYet": "Noch keine Vorlagen vorhanden. Erstellen Sie Ihre erste Vorlage!",
@@ -56,5 +57,7 @@
   "language": "Sprache",
   "english": "Englisch",
   "german": "Deutsch",
-  "russian": "Russisch"
+  "russian": "Russisch",
+  "preview": "Vorschau",
+  "previewDescription": "So wird Ihre Nachricht in Telegram erscheinen"
 }

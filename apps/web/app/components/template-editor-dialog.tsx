@@ -5,26 +5,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/compo
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import { Textarea } from '@repo/ui/components/textarea';
+import { toast } from '@repo/ui/toast';
+import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Exercise } from '../interfaces/exercise';
 import { WorkoutTemplate } from '../interfaces/workout-template';
+import { useModalStore } from '../stores/modal-store';
+import { useWorkoutTemplateStore } from '../stores/workout-template-store';
 
-interface TemplateEditorDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentTemplate: WorkoutTemplate | null;
-  setCurrentTemplate: (template: WorkoutTemplate) => void;
-  handleSaveTemplate: () => void;
-  t: (key: string) => string;
-}
+export function TemplateEditorDialog() {
+  const { t } = useTranslation('common');
 
-export function TemplateEditorDialog({
-  isOpen,
-  onClose,
-  currentTemplate,
-  setCurrentTemplate,
-  handleSaveTemplate,
-  t,
-}: TemplateEditorDialogProps) {
+  const { currentTemplate, setCurrentTemplate, setIsEditingTemplate, updateTemplate, addTemplate } =
+    useWorkoutTemplateStore();
+  const { closeModal } = useModalStore();
+  const isOpen = useModalStore((state) => state.isActive('templateEditor'));
+
   const updateTemplateField = (field: keyof WorkoutTemplate, value: string | Exercise[]) => {
     if (!currentTemplate) return;
 
@@ -67,8 +63,32 @@ export function TemplateEditorDialog({
     updateTemplateField('exercises', updatedExercises);
   };
 
+  const handleSaveTemplate = () => {
+    if (!currentTemplate) return;
+
+    if (!currentTemplate.name.trim()) {
+      toast.error(t('templateNameIsRequired'));
+      return;
+    }
+
+    if (currentTemplate.id) {
+      updateTemplate(currentTemplate);
+    } else {
+      const templateWithId: WorkoutTemplate = {
+        ...currentTemplate,
+        id: Date.now().toString(),
+      };
+      addTemplate(templateWithId);
+    }
+
+    setIsEditingTemplate(false);
+    setCurrentTemplate(null);
+    closeModal();
+    toast.success(t('templateSavedSuccessfully'));
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto sm:max-w-md lg:max-w-lg">
         <DialogHeader>
           <DialogTitle>{currentTemplate?.id ? t('edit') : t('newTemplate')}</DialogTitle>
@@ -115,56 +135,53 @@ export function TemplateEditorDialog({
                 {currentTemplate.exercises.map((exercise, index) => (
                   <div
                     key={exercise.id || index}
-                    className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4"
+                    className="flex gap-3 rounded-lg border border-slate-200 p-4"
                   >
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div>
-                        <Label htmlFor={`exercise-name-${index}`}>{t('exerciseName')}</Label>
-                        <Input
-                          id={`exercise-name-${index}`}
-                          value={exercise.name}
-                          onChange={(e) => updateExerciseInTemplate(index, 'name', e.target.value)}
-                          placeholder={t('enterExerciseName')}
-                        />
-                      </div>
-
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                          <Label htmlFor={`sets-${index}`}>{t('sets')}</Label>
-                          <Input
-                            id={`sets-${index}`}
-                            type="number"
-                            value={exercise.sets}
-                            onChange={(e) =>
-                              updateExerciseInTemplate(index, 'sets', parseInt(e.target.value))
-                            }
-                            min="1"
-                          />
-                        </div>
-
-                        <div className="flex-1">
-                          <Label htmlFor={`weight-${index}`}>{t('weight')}</Label>
-                          <Input
-                            id={`weight-${index}`}
-                            type="number"
-                            value={exercise.weight}
-                            onChange={(e) =>
-                              updateExerciseInTemplate(index, 'weight', parseInt(e.target.value))
-                            }
-                            min="0"
-                          />
-                        </div>
-                      </div>
+                    <div>
+                      <Label htmlFor={`exercise-name-${index}`}>{t('exerciseName')}</Label>
+                      <Input
+                        id={`exercise-name-${index}`}
+                        value={exercise.name}
+                        onChange={(e) => updateExerciseInTemplate(index, 'name', e.target.value)}
+                        placeholder={t('enterExerciseName')}
+                      />
                     </div>
 
-                    <div className="flex justify-end">
+                    <div className="flex-1">
+                      <Label htmlFor={`sets-${index}`}>{t('sets')}</Label>
+                      <Input
+                        id={`sets-${index}`}
+                        type="number"
+                        value={exercise.sets}
+                        onChange={(e) =>
+                          updateExerciseInTemplate(index, 'sets', parseInt(e.target.value))
+                        }
+                        min="1"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <Label htmlFor={`weight-${index}`}>{t('weight')}</Label>
+                      <Input
+                        id={`weight-${index}`}
+                        type="number"
+                        value={exercise.weight}
+                        onChange={(e) =>
+                          updateExerciseInTemplate(index, 'weight', parseInt(e.target.value))
+                        }
+                        min="0"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="h-6"></div>
                       <Button
                         type="button"
                         variant="destructive"
                         onClick={() => removeExerciseFromTemplate(index)}
-                        className="text-xs"
+                        disabled={currentTemplate.exercises.length <= 1}
                       >
-                        {t('delete')}
+                        <X className="size-4" />
                       </Button>
                     </div>
                   </div>
@@ -183,7 +200,11 @@ export function TemplateEditorDialog({
           </Button>
           <Button
             variant="outline"
-            onClick={onClose}
+            onClick={() => {
+              closeModal();
+              setIsEditingTemplate(false);
+              setCurrentTemplate(null);
+            }}
             className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             {t('cancel')}

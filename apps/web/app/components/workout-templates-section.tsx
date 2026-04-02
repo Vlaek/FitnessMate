@@ -1,24 +1,44 @@
 import { Button } from '@repo/ui/components/button';
 import { CardContent } from '@repo/ui/components/card';
+import { useTranslation } from 'react-i18next';
 import { WorkoutTemplate } from '../interfaces/workout-template';
+import { useModalStore } from '../stores/modal-store';
+import { useWorkoutTemplateStore } from '../stores/workout-template-store';
 
-interface WorkoutTemplatesSectionProps {
-  templates: WorkoutTemplate[];
-  handleAddNewTemplate: () => void;
-  handleEditTemplate: (template: WorkoutTemplate) => void;
-  handleDeleteTemplate: (id: string) => void;
-  handleStartWorkout: (template: WorkoutTemplate) => void;
-  t: (key: string) => string;
-}
+export function WorkoutTemplatesSection() {
+  const { t } = useTranslation('common');
 
-export function WorkoutTemplatesSection({
-  templates,
-  handleAddNewTemplate,
-  handleEditTemplate,
-  handleDeleteTemplate,
-  handleStartWorkout,
-  t,
-}: WorkoutTemplatesSectionProps) {
+  const { templates, deleteTemplate, setCurrentTemplate, setIsEditingTemplate } =
+    useWorkoutTemplateStore();
+  const { openModal } = useModalStore();
+
+  const handleDeleteTemplate = (id: string) => {
+    if (confirm(t('areYouSureYouWantToDeleteThisTemplate'))) {
+      deleteTemplate(id);
+    }
+  };
+
+  const handleStartWorkout = (template: WorkoutTemplate) => {
+    openModal('workoutSession', { template });
+  };
+
+  const handleAddNewTemplate = () => {
+    setCurrentTemplate({
+      id: Math.random().toString(36).substr(2, 9),
+      name: '',
+      description: '',
+      exercises: [{ id: Math.random().toString(36).substr(2, 9), name: '', sets: 3, weight: 0 }],
+    });
+    setIsEditingTemplate(true);
+    openModal('templateEditor');
+  };
+
+  const handleEditTemplate = (template: WorkoutTemplate) => {
+    setCurrentTemplate({ ...template });
+    setIsEditingTemplate(true);
+    openModal('templateEditor');
+  };
+
   return (
     <div className="mb-10 overflow-hidden rounded-2xl bg-white shadow-xl">
       <div className="bg-teal-600 p-6">

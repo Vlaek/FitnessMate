@@ -3,26 +3,20 @@ import { CardContent, CardFooter } from '@repo/ui/components/card';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import { toast } from '@repo/ui/toast';
+import { useTranslation } from 'react-i18next';
+import { useTelegramStore } from '../stores/telegram-store';
 
-interface TelegramIntegrationSectionProps {
-  telegramToken: string;
-  chatId: string;
-  setToken: (token: string) => void;
-  setChatId: (chatId: string) => void;
-  resetToken: () => void;
-  isConfigured: () => boolean;
-  t: (key: string) => string;
-}
+export function TelegramIntegrationSection() {
+  const { t } = useTranslation('common');
+  const {
+    token: telegramToken,
+    chatId,
+    setToken,
+    setChatId,
+    resetToken,
+    isConfigured,
+  } = useTelegramStore();
 
-export function TelegramIntegrationSection({
-  telegramToken,
-  chatId,
-  setToken,
-  setChatId,
-  resetToken,
-  isConfigured,
-  t,
-}: TelegramIntegrationSectionProps) {
   const handleSaveToken = () => {
     setToken(telegramToken);
     toast.success(t('telegramTokenSavedSuccessfully') || 'Telegram token saved successfully!');
@@ -37,9 +31,7 @@ export function TelegramIntegrationSection({
     <div className="mb-10 overflow-hidden rounded-2xl bg-white shadow-xl">
       <div className="bg-blue-600 p-6">
         <h2 className="text-2xl font-bold text-white">{t('telegramIntegration')}</h2>
-        <p className="text-blue-100">
-          {t('configureYourTelegramBotTokenToSendWorkoutReports')}
-        </p>
+        <p className="text-blue-100">{t('configureYourTelegramBotTokenToSendWorkoutReports')}</p>
       </div>
       <CardContent className="px-6 py-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -60,14 +52,14 @@ export function TelegramIntegrationSection({
             <Label htmlFor="chatId" className="text-slate-700">
               {t('chatID')}
             </Label>
-              <Input
-                id="chatId"
-                type="text"
-                value={chatId}
-                onChange={(e) => setChatId(e.target.value)}
-                placeholder={t('enterTargetChatID')}
-                className="mt-1 w-full rounded-lg border border-slate-300 p-3"
-              />
+            <Input
+              id="chatId"
+              type="text"
+              value={chatId}
+              onChange={(e) => setChatId(e.target.value)}
+              placeholder={t('enterTargetChatID')}
+              className="mt-1 w-full rounded-lg border border-slate-300 p-3"
+            />
           </div>
         </div>
       </CardContent>
