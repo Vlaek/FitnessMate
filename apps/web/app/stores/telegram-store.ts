@@ -21,7 +21,7 @@ export const useTelegramStore = create<TelegramState>()(
       isConfigured: () => !!get().token,
     }),
     {
-      name: 'telegram-storage', // name of the item in the storage (must be unique)
-    }
-  )
+      name: 'telegram-storage',
+    },
+  ),
 );
