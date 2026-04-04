@@ -10,10 +10,10 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Exercise } from '../interfaces/exercise';
 import { WorkoutTemplate } from '../interfaces/workout-template';
-import { generateWorkoutText } from '../utils/workout-text-generator';
 import { TelegramService } from '../services/telegram-service';
 import { useModalStore } from '../stores/modal-store';
 import { useTelegramStore } from '../stores/telegram-store';
+import { generateWorkoutText } from '../utils/workout-text-generator';
 import { WorkoutPreview } from './workout-preview';
 
 export function WorkoutSessionDialog() {
@@ -99,7 +99,7 @@ export function WorkoutSessionDialog() {
       workoutExercises,
       workoutDescription,
       workoutName,
-      useWeekdayPrefix
+      useWeekdayPrefix,
     );
 
     if (isConfigured() && chatId) {
