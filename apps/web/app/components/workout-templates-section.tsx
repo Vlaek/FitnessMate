@@ -24,10 +24,9 @@ export function WorkoutTemplatesSection() {
 
   const handleAddNewTemplate = () => {
     setCurrentTemplate({
-      id: Math.random().toString(36).substr(2, 9),
       name: '',
       description: '',
-      exercises: [{ id: Math.random().toString(36).substr(2, 9), name: '', sets: 3, weight: 0 }],
+      exercises: [{ id: Math.random().toString(36).substr(2, 9), name: '', sets: '3', weight: '0' }],
     });
     setIsEditingTemplate(true);
     openModal('templateEditor');

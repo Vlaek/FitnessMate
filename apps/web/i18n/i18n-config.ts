@@ -11,6 +11,9 @@ i18n
     fallbackLng: 'en',
     debug: process.env.NODE_ENV !== 'production',
 
+    defaultNS: 'common',
+    ns: ['common'],
+
     interpolation: {
       escapeValue: false,
     },

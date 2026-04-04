@@ -5,4 +5,5 @@ export interface WorkoutTemplate {
   name: string;
   description: string;
   exercises: Exercise[];
+  useWeekdayPrefix?: boolean;
 }

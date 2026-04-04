@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { WorkoutTemplate } from '../interfaces/workout-template';
 
+// Legacy storage class for migration purposes
+const LEGACY_WORKOUT_TEMPLATES_KEY = 'workout_templates';
+
 interface WorkoutTemplateState {
   templates: WorkoutTemplate[];
   currentTemplate: WorkoutTemplate | null;
@@ -52,6 +55,28 @@ export const useWorkoutTemplateStore = create<WorkoutTemplateState>()(
     }),
     {
       name: 'workout-template-storage', // name of the item in the storage (must be unique)
+      onRehydrateStorage: () => {
+        // Before hydration
+        return (state, error) => {
+          if (error) {
+            console.error('An error happened during hydration', error);
+          } else if (state && state.templates.length === 0) {
+            // If the persisted state is empty, try loading from legacy storage
+            try {
+              const legacyStored = localStorage.getItem(LEGACY_WORKOUT_TEMPLATES_KEY);
+              if (legacyStored) {
+                const legacyTemplates = JSON.parse(legacyStored);
+                if (Array.isArray(legacyTemplates) && legacyTemplates.length > 0) {
+                  // Update the state with legacy templates
+                  state.setTemplates(legacyTemplates);
+                }
+              }
+            } catch (e) {
+              console.error('Error loading legacy templates', e);
+            }
+          }
+        };
+      },
     },
   ),
 );

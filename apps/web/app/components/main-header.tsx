@@ -5,20 +5,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@repo/ui/components/dropdown-menu';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguageStore } from '../stores/language-store';
 
 export function MainHeader() {
   const { t, i18n } = useTranslation('common');
   const { setLanguage, initializeLanguage } = useLanguageStore();
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Get the current language from the store
   const currentLanguage = initializeLanguage();
 
   const changeLanguage = (lng: string) => {
-    // Update the store
     setLanguage(lng);
-    // Change the i18n language
     i18n.changeLanguage(lng);
   };
 
@@ -35,23 +34,27 @@ export function MainHeader() {
     }
   };
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <header className="mb-12 text-center">
       <div className="mb-4 flex items-center justify-between">
         <div></div>
         <div>
           <h1 className="text-5xl font-extrabold tracking-tight text-slate-900">
-            {t('fitnessmate')}
+            {isMounted ? t('fitnessmate') : 'FitnessMate'}
           </h1>
         </div>
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-24">
-                {getCurrentLanguageName()}
+                {isMounted ? getCurrentLanguageName() : 'Language'}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-24">
+            <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => changeLanguage('en')}>
                 {t('english') || 'English'}
               </DropdownMenuItem>
@@ -65,9 +68,6 @@ export function MainHeader() {
           </DropdownMenu>
         </div>
       </div>
-      <p className="mx-auto max-w-3xl text-xl text-slate-600">
-        {t('trackYourWorkoutsAndShareResultsViaTelegram')}
-      </p>
     </header>
   );
 }

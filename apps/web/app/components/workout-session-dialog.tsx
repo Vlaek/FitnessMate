@@ -1,6 +1,5 @@
-'use client';
-
 import { Button } from '@repo/ui/components/button';
+import { Checkbox } from '@repo/ui/components/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
@@ -14,11 +13,13 @@ import { WorkoutTemplate } from '../interfaces/workout-template';
 import { TelegramService } from '../services/telegram-service';
 import { useModalStore } from '../stores/modal-store';
 import { useTelegramStore } from '../stores/telegram-store';
+import { WorkoutPreview } from './workout-preview';
 
 export function WorkoutSessionDialog() {
   const { t } = useTranslation('common');
 
   const [workoutExercises, setWorkoutExercises] = useState<Exercise[]>([]);
+  const [workoutName, setWorkoutName] = useState('');
   const [workoutDescription, setWorkoutDescription] = useState('');
   const [useWeekdayPrefix, setUseWeekdayPrefix] = useState(false);
 
@@ -33,8 +34,14 @@ export function WorkoutSessionDialog() {
         template.exercises.map((ex) => ({
           ...ex,
           id: ex.id || Math.random().toString(36).substr(2, 9),
+          sets: ex.sets.toString(),
+          weight: ex.weight.toString(),
         })),
       );
+
+      setWorkoutName(template.name);
+      setWorkoutDescription(template.description || '');
+      setUseWeekdayPrefix(template.useWeekdayPrefix || false);
     }
   }, [activeModal]);
 
@@ -51,9 +58,9 @@ export function WorkoutSessionDialog() {
     } else if (field === 'name') {
       updatedExercise = { ...currentExercise, name: value as string };
     } else if (field === 'sets') {
-      updatedExercise = { ...currentExercise, sets: value as number };
+      updatedExercise = { ...currentExercise, sets: value as string };
     } else if (field === 'weight') {
-      updatedExercise = { ...currentExercise, weight: value as number };
+      updatedExercise = { ...currentExercise, weight: value as string };
     } else {
       return;
     }
@@ -67,8 +74,8 @@ export function WorkoutSessionDialog() {
     const newExercise: Exercise = {
       id: Math.random().toString(36).substr(2, 9),
       name: '',
-      sets: 3,
-      weight: 0,
+      sets: '3',
+      weight: '0',
     };
     setWorkoutExercises([...workoutExercises, newExercise]);
   };
@@ -101,7 +108,7 @@ export function WorkoutSessionDialog() {
       report += `${days[today.getDay()]}\n\n`;
     }
 
-    report += `${t('workoutSession')}: ${activeModal.data?.template?.name}\n`;
+    report += `${t('workoutSession')}: ${workoutName}\n`;
     if (workoutDescription.trim()) {
       report += `\n${workoutDescription}\n\n`;
     } else {
@@ -132,6 +139,7 @@ export function WorkoutSessionDialog() {
 
     closeModal();
     setWorkoutExercises([]);
+    setWorkoutName('');
     setWorkoutDescription('');
   };
 
@@ -149,49 +157,26 @@ export function WorkoutSessionDialog() {
     return days[today.getDay()];
   };
 
-  const generatePreview = () => {
-    let preview = '';
-
-    if (useWeekdayPrefix) {
-      const days = [
-        t('sunday'),
-        t('monday'),
-        t('tuesday'),
-        t('wednesday'),
-        t('thursday'),
-        t('friday'),
-        t('saturday'),
-      ];
-      const today = new Date();
-      preview += `${days[today.getDay()]}\n\n`;
-    }
-
-    preview += `${t('workoutSession')}: ${activeModal.data?.template?.name || ''}\n`;
-    if (workoutDescription.trim()) {
-      preview += `\n${workoutDescription}\n\n`;
-    } else {
-      preview += '\n';
-    }
-
-    preview += `${t('exercises')}:\n`;
-    workoutExercises.forEach((ex, index) => {
-      preview += `${index + 1}. ${ex.name || t('enterExerciseName')} - ${ex.sets} ${t('sets')} x ${ex.weight}kg\n`;
-    });
-
-    return preview;
-  };
-
   return (
     <Dialog open={isOpen && !!activeModal.data} onOpenChange={closeModal}>
       <DialogContent className="grid max-h-[90vh] max-w-5xl grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
         <div className="space-y-4">
           <DialogHeader>
-            <DialogTitle>
-              {t('workoutSession')}: {activeModal.data?.template?.name}
-            </DialogTitle>
+            <DialogTitle>{t('workoutSession')}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
+            <div>
+              <Label htmlFor="workout-name">{t('workoutName')}</Label>
+              <Input
+                id="workout-name"
+                value={workoutName}
+                onChange={(e) => setWorkoutName(e.target.value)}
+                placeholder={t('enterTemplateName')}
+                className="mt-1"
+              />
+            </div>
+
             <div>
               <Label htmlFor="workout-description">{t('workoutDescription')}</Label>
               <Textarea
@@ -204,12 +189,11 @@ export function WorkoutSessionDialog() {
             </div>
 
             <div className="flex items-center">
-              <input
-                type="checkbox"
+              <Checkbox
                 id="use-weekday-prefix"
                 checked={useWeekdayPrefix}
-                onChange={(e) => setUseWeekdayPrefix(e.target.checked)}
-                className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                onCheckedChange={(value) => setUseWeekdayPrefix(!!value)}
+                className="mr-2"
               />
               <Label htmlFor="use-weekday-prefix">
                 {t('addWeekdayPrefix')} ({getWeekdayName()})
@@ -249,12 +233,9 @@ export function WorkoutSessionDialog() {
                       <Label htmlFor={`sets-${index}`}>{t('sets')}</Label>
                       <Input
                         id={`sets-${index}`}
-                        type="number"
+                        type="text"
                         value={exercise.sets}
-                        onChange={(e) =>
-                          updateExerciseField(index, 'sets', parseInt(e.target.value))
-                        }
-                        min="1"
+                        onChange={(e) => updateExerciseField(index, 'sets', e.target.value)}
                       />
                     </div>
 
@@ -262,12 +243,9 @@ export function WorkoutSessionDialog() {
                       <Label htmlFor={`weight-${index}`}>{t('weight')}</Label>
                       <Input
                         id={`weight-${index}`}
-                        type="number"
+                        type="text"
                         value={exercise.weight}
-                        onChange={(e) =>
-                          updateExerciseField(index, 'weight', parseInt(e.target.value))
-                        }
-                        min="0"
+                        onChange={(e) => updateExerciseField(index, 'weight', e.target.value)}
                       />
                     </div>
 
@@ -307,9 +285,12 @@ export function WorkoutSessionDialog() {
 
         <div className="sticky top-0 h-full max-h-[calc(100vh-16rem)] border-l border-slate-200 pl-6">
           <h3 className="mb-4 text-lg font-medium">{t('preview')}</h3>
-          <div className="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <pre className="font-sans text-sm whitespace-pre-wrap">{generatePreview()}</pre>
-          </div>
+          <WorkoutPreview
+            exercises={workoutExercises}
+            description={workoutDescription}
+            templateName={workoutName}
+            useWeekdayPrefix={useWeekdayPrefix}
+          />
           <p className="mt-2 text-xs text-slate-500">{t('previewDescription')}</p>
         </div>
       </DialogContent>
