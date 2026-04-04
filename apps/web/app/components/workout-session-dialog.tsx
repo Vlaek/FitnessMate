@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Exercise } from '../interfaces/exercise';
 import { WorkoutTemplate } from '../interfaces/workout-template';
+import { generateWorkoutText } from '../utils/workout-text-generator';
 import { TelegramService } from '../services/telegram-service';
 import { useModalStore } from '../stores/modal-store';
 import { useTelegramStore } from '../stores/telegram-store';
@@ -93,32 +94,13 @@ export function WorkoutSessionDialog() {
   const handleEndWorkout = () => {
     if (!activeModal.data?.template) return;
 
-    let report = '';
-    if (useWeekdayPrefix) {
-      const days = [
-        t('sunday'),
-        t('monday'),
-        t('tuesday'),
-        t('wednesday'),
-        t('thursday'),
-        t('friday'),
-        t('saturday'),
-      ];
-      const today = new Date();
-      report += `${days[today.getDay()]}\n\n`;
-    }
-
-    report += `${t('workoutSession')}: ${workoutName}\n`;
-    if (workoutDescription.trim()) {
-      report += `\n${workoutDescription}\n\n`;
-    } else {
-      report += '\n';
-    }
-
-    report += `${t('exercises')}:\n`;
-    workoutExercises.forEach((ex, index) => {
-      report += `${index + 1}. ${ex.name} - ${ex.sets} ${t('sets')} x ${ex.weight}kg\n`;
-    });
+    const report = generateWorkoutText(
+      t,
+      workoutExercises,
+      workoutDescription,
+      workoutName,
+      useWeekdayPrefix
+    );
 
     if (isConfigured() && chatId) {
       TelegramService.sendMessage(report, chatId)
