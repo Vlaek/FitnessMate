@@ -256,7 +256,7 @@ export function TemplateEditorDialog() {
               useWeekdayPrefix={currentTemplate.useWeekdayPrefix}
             />
           )}
-          <p className="mt-2 text-xs text-slate-500">{t('templatePreviewDescription')}</p>
+          <p className="mt-2 text-xs text-slate-500">{t('previewDescription')}</p>
         </div>
       </DialogContent>
     </Dialog>
