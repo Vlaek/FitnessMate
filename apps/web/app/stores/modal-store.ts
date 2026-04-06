@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 
-type ModalType = 'workoutSession' | 'templateEditor' | null;
+type ModalType = 'workoutSession' | 'templateEditor' | 'workoutHistoryDetail' | null;
 
 interface IModalData {
   template?: any;
+  workoutHistory?: any;
   [key: string]: any;
 }
 

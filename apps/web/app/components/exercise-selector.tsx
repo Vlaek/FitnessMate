@@ -15,8 +15,6 @@ export function ExerciseSelector({ value, placeholder, onChange }: IProps) {
   const { t } = useTranslation('common');
   const { exercises, initialized, initializeExercises } = useExerciseCatalogStore();
 
-  console.log(exercises);
-
   useEffect(() => {
     if (!initialized) {
       initializeExercises();

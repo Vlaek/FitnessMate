@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { IWorkoutHistory } from '../interfaces/workout-history';
 import { useExerciseCatalogStore } from '../stores/exercise-catalog-store';
+import { useModalStore } from '../stores/modal-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
 import { formatDateDDMMYYYY } from '../utils/workout-text-generator';
 
@@ -37,6 +38,7 @@ const AnalyticsPage = () => {
   const { getAllWorkouts } = useWorkoutHistoryStore();
   const { initializeExercises, exercises } = useExerciseCatalogStore();
   const [workoutHistory, setWorkoutHistory] = useState<IWorkoutHistory[]>([]);
+  const { openModal } = useModalStore();
 
   useEffect(() => {
     initializeExercises();
@@ -48,7 +50,7 @@ const AnalyticsPage = () => {
   }, [getAllWorkouts]);
 
   const chartData = workoutHistory.map((workout) => ({
-    date: formatDateDDMMYYYY(workout.date, t), // Format as DD.MM.YYYY using utility function
+    date: formatDateDDMMYYYY(workout.date, t),
     templateName: workout.templateName,
     exercisesCount: workout.exercises.length,
     totalVolume: workout.exercises.reduce((sum, ex) => {
@@ -84,13 +86,13 @@ const AnalyticsPage = () => {
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
           .map((item) => ({
             ...item,
-            date: formatDateDDMMYYYY(item.date, t), // Format the date consistently using utility function
+            date: formatDateDDMMYYYY(item.date, t),
           }));
       }
     }
 
     return workoutHistory.slice(0, 3).map((workout, idx) => ({
-      date: formatDateDDMMYYYY(workout.date, t), // Format the date for default case as well
+      date: formatDateDDMMYYYY(workout.date, t),
       weight: idx * 2.5 + 80,
     }));
   })();
@@ -265,10 +267,16 @@ const AnalyticsPage = () => {
             <CardContent>
               <div className="space-y-4">
                 {workoutHistory.slice(-5).map((workout) => (
-                  <div key={workout.id} className="rounded-lg border border-slate-200 p-4">
+                  <div
+                    key={workout.id}
+                    className="cursor-pointer rounded-lg border border-slate-200 p-4 transition-all hover:border-blue-400 hover:bg-blue-50/30"
+                    onClick={() => openModal('workoutHistoryDetail', { workoutHistory: workout })}
+                  >
                     <div className="flex justify-between">
-                      <h4 className="font-medium">{workout.templateName}</h4>
-                      <span className="text-sm text-slate-500">{formatDateDDMMYYYY(workout.date, t)}</span>
+                      <h4 className="font-medium text-slate-800">{workout.templateName}</h4>
+                      <span className="text-sm text-slate-500">
+                        {formatDateDDMMYYYY(workout.date, t)}
+                      </span>
                     </div>
                     <div className="mt-2 flex items-center text-sm text-slate-600">
                       <span>
