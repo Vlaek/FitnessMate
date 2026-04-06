@@ -1,7 +1,7 @@
 import { Button } from '@repo/ui/components/button';
 import { CardContent } from '@repo/ui/components/card';
 import { useTranslation } from 'react-i18next';
-import { WorkoutTemplate } from '../interfaces/workout-template';
+import { IWorkoutTemplate } from '../interfaces/workout-template';
 import { useModalStore } from '../stores/modal-store';
 import { useWorkoutTemplateStore } from '../stores/workout-template-store';
 
@@ -18,7 +18,7 @@ export function WorkoutTemplatesSection() {
     }
   };
 
-  const handleStartWorkout = (template: WorkoutTemplate) => {
+  const handleStartWorkout = (template: IWorkoutTemplate) => {
     openModal('workoutSession', { template });
   };
 
@@ -26,13 +26,13 @@ export function WorkoutTemplatesSection() {
     setCurrentTemplate({
       name: '',
       description: '',
-      exercises: [{ id: Math.random().toString(36).substr(2, 9), name: '', sets: '3', weight: '0' }],
+      exercises: [{ id: Math.random().toString(36).substr(2, 9), name: '', sets: '3', weight: 0 }],
     });
     setIsEditingTemplate(true);
     openModal('templateEditor');
   };
 
-  const handleEditTemplate = (template: WorkoutTemplate) => {
+  const handleEditTemplate = (template: IWorkoutTemplate) => {
     setCurrentTemplate({ ...template });
     setIsEditingTemplate(true);
     openModal('templateEditor');
@@ -80,7 +80,7 @@ export function WorkoutTemplatesSection() {
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={() => handleDeleteTemplate(template.id)}
+                    onClick={() => handleDeleteTemplate(template?.id || '')}
                     className="flex-1"
                   >
                     {t('delete')}

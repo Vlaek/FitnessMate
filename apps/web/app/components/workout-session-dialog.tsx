@@ -1,5 +1,4 @@
 import { Button } from '@repo/ui/components/button';
-import { Checkbox } from '@repo/ui/components/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
@@ -8,35 +7,38 @@ import { toast } from '@repo/ui/toast';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Exercise } from '../interfaces/exercise';
-import { WorkoutTemplate } from '../interfaces/workout-template';
+import { IExercise } from '../interfaces/exercise';
+import { IWorkoutTemplate } from '../interfaces/workout-template';
 import { TelegramService } from '../services/telegram-service';
 import { useModalStore } from '../stores/modal-store';
 import { useTelegramStore } from '../stores/telegram-store';
+import { useWorkoutHistoryStore } from '../stores/workout-history-store';
 import { generateWorkoutText } from '../utils/workout-text-generator';
+import { ExerciseSelector } from './exercise-selector';
 import { WorkoutPreview } from './workout-preview';
 
 export function WorkoutSessionDialog() {
   const { t } = useTranslation('common');
 
-  const [workoutExercises, setWorkoutExercises] = useState<Exercise[]>([]);
+  const [workoutExercises, setWorkoutExercises] = useState<IExercise[]>([]);
   const [workoutName, setWorkoutName] = useState('');
   const [workoutDescription, setWorkoutDescription] = useState('');
   const [useWeekdayPrefix, setUseWeekdayPrefix] = useState(false);
 
   const { chatId, isConfigured } = useTelegramStore();
+  const { addWorkoutToHistory } = useWorkoutHistoryStore();
   const isOpen = useModalStore((state) => state.isActive('workoutSession'));
   const { activeModal, closeModal, isActive } = useModalStore();
 
   useEffect(() => {
     if (isActive('workoutSession') && activeModal?.data?.template) {
-      const template = activeModal.data.template as WorkoutTemplate;
+      const template = activeModal.data.template as IWorkoutTemplate;
       setWorkoutExercises(
         template.exercises.map((ex) => ({
           ...ex,
           id: ex.id || Math.random().toString(36).substr(2, 9),
           sets: ex.sets.toString(),
-          weight: ex.weight.toString(),
+          weight: Number(ex.weight), // Convert to number
         })),
       );
 
@@ -46,13 +48,13 @@ export function WorkoutSessionDialog() {
     }
   }, [activeModal]);
 
-  const updateExerciseField = (index: number, field: keyof Exercise, value: string | number) => {
+  const updateExerciseField = (index: number, field: keyof IExercise, value: string | number) => {
     const updatedExercises = [...workoutExercises];
 
     const currentExercise = updatedExercises[index];
     if (!currentExercise) return;
 
-    let updatedExercise: Exercise;
+    let updatedExercise: IExercise;
 
     if (field === 'id') {
       updatedExercise = { ...currentExercise, id: value as string };
@@ -61,7 +63,7 @@ export function WorkoutSessionDialog() {
     } else if (field === 'sets') {
       updatedExercise = { ...currentExercise, sets: value as string };
     } else if (field === 'weight') {
-      updatedExercise = { ...currentExercise, weight: value as string };
+      updatedExercise = { ...currentExercise, weight: Number(value) }; // Ensure it's a number
     } else {
       return;
     }
@@ -72,11 +74,11 @@ export function WorkoutSessionDialog() {
   };
 
   const addExercise = () => {
-    const newExercise: Exercise = {
+    const newExercise: IExercise = {
       id: Math.random().toString(36).substr(2, 9),
       name: '',
       sets: '3',
-      weight: '0',
+      weight: 0,
     };
     setWorkoutExercises([...workoutExercises, newExercise]);
   };
@@ -92,6 +94,22 @@ export function WorkoutSessionDialog() {
   };
 
   const handleEndWorkout = () => {
+    if (!activeModal.data?.template) return;
+
+    // Save workout to history
+    addWorkoutToHistory({
+      date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
+      templateName: workoutName,
+      exercises: workoutExercises,
+    });
+
+    closeModal();
+    setWorkoutExercises([]);
+    setWorkoutName('');
+    setWorkoutDescription('');
+  };
+
+  const handleSendReport = () => {
     if (!activeModal.data?.template) return;
 
     const report = generateWorkoutText(
@@ -118,6 +136,13 @@ export function WorkoutSessionDialog() {
     } else {
       toast.error(t('pleaseConfigureYourTelegramTokenAndChatIDToSendReports'));
     }
+
+    // Still save to history when sending report
+    addWorkoutToHistory({
+      date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
+      templateName: workoutName,
+      exercises: workoutExercises,
+    });
 
     closeModal();
     setWorkoutExercises([]);
@@ -171,11 +196,12 @@ export function WorkoutSessionDialog() {
             </div>
 
             <div className="flex items-center">
-              <Checkbox
+              <input
+                type="checkbox"
                 id="use-weekday-prefix"
                 checked={useWeekdayPrefix}
-                onCheckedChange={(value) => setUseWeekdayPrefix(!!value)}
-                className="mr-2"
+                onChange={(e) => setUseWeekdayPrefix(e.target.checked)}
+                className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
               <Label htmlFor="use-weekday-prefix">
                 {t('addWeekdayPrefix')} ({getWeekdayName()})
@@ -197,21 +223,17 @@ export function WorkoutSessionDialog() {
 
               <div className="mt-4 space-y-4">
                 {workoutExercises.map((exercise, index) => (
-                  <div
-                    key={exercise.id}
-                    className="flex gap-3 rounded-lg border border-slate-200 p-4"
-                  >
-                    <div className="flex-1">
+                  <div key={exercise.id} className="flex flex-wrap items-center gap-2">
+                    <div className="min-w-[200px] flex-1">
                       <Label htmlFor={`exercise-name-${index}`}>{t('exerciseName')}</Label>
-                      <Input
-                        id={`exercise-name-${index}`}
+                      <ExerciseSelector
                         value={exercise.name}
-                        onChange={(e) => updateExerciseField(index, 'name', e.target.value)}
+                        onChange={(nameKey) => updateExerciseField(index, 'name', nameKey)}
                         placeholder={t('enterExerciseName')}
                       />
                     </div>
 
-                    <div className="w-20">
+                    <div className="w-16">
                       <Label htmlFor={`sets-${index}`}>{t('sets')}</Label>
                       <Input
                         id={`sets-${index}`}
@@ -225,9 +247,11 @@ export function WorkoutSessionDialog() {
                       <Label htmlFor={`weight-${index}`}>{t('weight')}</Label>
                       <Input
                         id={`weight-${index}`}
-                        type="text"
+                        type="number"
                         value={exercise.weight}
-                        onChange={(e) => updateExerciseField(index, 'weight', e.target.value)}
+                        onChange={(e) =>
+                          updateExerciseField(index, 'weight', Number(e.target.value))
+                        }
                       />
                     </div>
 
@@ -253,14 +277,14 @@ export function WorkoutSessionDialog() {
               onClick={handleEndWorkout}
               className="flex-1 bg-green-600 text-white hover:bg-green-700"
             >
-              {t('sendReport')}
+              {t('endWorkout')}
             </Button>
             <Button
               variant="outline"
-              onClick={closeModal}
+              onClick={handleSendReport}
               className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
             >
-              {t('endWorkout')}
+              {t('sendReport')}
             </Button>
           </div>
         </div>

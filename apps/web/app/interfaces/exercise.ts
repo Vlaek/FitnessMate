@@ -1,6 +1,13 @@
-export interface Exercise {
+export interface IExercise {
   id: string;
   name: string;
   sets: string;
-  weight: string;
+  weight: number;
+  muscleGroup?: string;
+}
+
+export interface IExerciseCatalog {
+  id: string;
+  nameKey: string;
+  muscleGroup?: string;
 }

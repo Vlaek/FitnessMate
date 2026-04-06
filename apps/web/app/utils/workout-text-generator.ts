@@ -1,14 +1,15 @@
 import { TFunction } from 'i18next';
-import { Exercise } from '../interfaces/exercise';
+import { IExercise } from '../interfaces/exercise';
 
 export function generateWorkoutText(
   t: TFunction,
-  exercises: Exercise[],
+  exercises: IExercise[],
   description: string,
   templateName?: string,
-  useWeekdayPrefix?: boolean
+  useWeekdayPrefix?: boolean,
 ): string {
   let text = '';
+  const hasExercises = exercises.some((item) => item.name.length > 0);
 
   if (useWeekdayPrefix) {
     const days = [
@@ -32,26 +33,33 @@ export function generateWorkoutText(
     text += `${description}\n\n`;
   }
 
+  if (!hasExercises) {
+    return text;
+  }
+
   text += `${t('exercises')}:\n`;
+
   exercises.forEach((ex, index) => {
-    text += `${index + 1}. ${ex.name || t('enterExerciseName')}`;
+    if (ex.name) {
+      text += `${index + 1}. ${ex.name || t('enterExerciseName')}`;
 
-    if (!ex.sets.length && !ex.weight.length) {
-      text += '\n';
-    }
-
-    if (ex.sets.length || ex.weight.length) {
-      text += ' - ';
-
-      if (ex.sets.length) {
-        text += `${ex.sets} `;
+      if (!ex.sets.length && !ex.weight) {
+        text += '\n';
       }
 
-      if (ex.weight.length) {
-        text += ex.sets.length ? `x ${ex.weight} ` : `${ex.weight} `;
-      }
+      if (ex.sets.length || ex.weight) {
+        text += ' - ';
 
-      text += '\n';
+        if (ex.sets.length) {
+          text += `${ex.sets} `;
+        }
+
+        if (ex.weight) {
+          text += ex.sets.length ? `x ${ex.weight} ${t('kg')}` : `${ex.weight} ${t('kg')}`;
+        }
+
+        text += '\n';
+      }
     }
   });
 

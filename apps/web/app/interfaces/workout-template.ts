@@ -1,9 +1,9 @@
-import { Exercise } from './exercise';
+import { IExercise } from './exercise';
 
-export interface WorkoutTemplate {
+export interface IWorkoutTemplate {
   id?: string;
   name: string;
   description: string;
-  exercises: Exercise[];
+  exercises: IExercise[];
   useWeekdayPrefix?: boolean;
 }

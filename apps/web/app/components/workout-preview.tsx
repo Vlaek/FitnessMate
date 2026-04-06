@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { Exercise } from '../interfaces/exercise';
+import { IExercise } from '../interfaces/exercise';
 import { generateWorkoutText } from '../utils/workout-text-generator';
 
-interface WorkoutPreviewProps {
-  exercises: Exercise[];
+interface IProps {
+  exercises: IExercise[];
   description: string;
   templateName?: string;
   useWeekdayPrefix?: boolean;
@@ -14,7 +14,7 @@ export function WorkoutPreview({
   description,
   templateName = '',
   useWeekdayPrefix = false,
-}: WorkoutPreviewProps) {
+}: IProps) {
   const { t } = useTranslation('common');
 
   const generatePreview = () => {

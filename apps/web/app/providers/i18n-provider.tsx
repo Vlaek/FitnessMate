@@ -5,11 +5,11 @@ import { I18nextProvider } from 'react-i18next';
 import i18nConfig from '../../i18n/i18n-config';
 import { useLanguageStore } from '../stores/language-store';
 
-interface I18nProviderProps {
+interface IProps {
   children: React.ReactNode;
 }
 
-export default function I18nProvider({ children }: I18nProviderProps) {
+export default function I18nProvider({ children }: IProps) {
   const { initializeLanguage } = useLanguageStore();
   const [initialized, setInitialized] = useState(false);
 

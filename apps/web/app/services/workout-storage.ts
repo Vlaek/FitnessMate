@@ -1,14 +1,14 @@
-import { WorkoutTemplate } from '../interfaces/workout-template';
+import { IWorkoutTemplate } from '../interfaces/workout-template';
 
 const WORKOUT_TEMPLATES_KEY = 'workout_templates';
 
 export class WorkoutStorage {
-  static getAllTemplates(): WorkoutTemplate[] {
+  static getAllTemplates(): IWorkoutTemplate[] {
     const stored = localStorage.getItem(WORKOUT_TEMPLATES_KEY);
     return stored ? JSON.parse(stored) : [];
   }
 
-  static saveTemplate(template: WorkoutTemplate): void {
+  static saveTemplate(template: IWorkoutTemplate): void {
     const templates = this.getAllTemplates();
 
     if (!template.id) {
@@ -31,7 +31,7 @@ export class WorkoutStorage {
     localStorage.setItem(WORKOUT_TEMPLATES_KEY, JSON.stringify(templates));
   }
 
-  static getTemplateById(id: string): WorkoutTemplate | undefined {
+  static getTemplateById(id: string): IWorkoutTemplate | undefined {
     const templates = this.getAllTemplates();
     return templates.find((t) => t.id === id);
   }

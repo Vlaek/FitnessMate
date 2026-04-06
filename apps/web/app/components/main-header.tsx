@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@repo/ui/components/dropdown-menu';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguageStore } from '../stores/language-store';
@@ -41,7 +42,11 @@ export function MainHeader() {
   return (
     <header className="mb-12 text-center">
       <div className="mb-4 flex items-center justify-between">
-        <div></div>
+        <div>
+          <Link href="/analytics">
+            <Button variant="ghost">{t('workoutAnalytics')}</Button>
+          </Link>
+        </div>
         <div>
           <h1 className="text-5xl font-extrabold tracking-tight text-slate-900">
             {isMounted ? t('fitnessmate') : 'FitnessMate'}

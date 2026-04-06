@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface TelegramState {
+interface ITelegramState {
   token: string;
   chatId: string;
   setToken: (token: string) => void;
@@ -10,7 +10,7 @@ interface TelegramState {
   isConfigured: () => boolean;
 }
 
-export const useTelegramStore = create<TelegramState>()(
+export const useTelegramStore = create<ITelegramState>()(
   persist(
     (set, get) => ({
       token: '',

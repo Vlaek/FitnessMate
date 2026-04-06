@@ -12,6 +12,7 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
+    "@types/recharts": "^2.0.1",
     "eslint": "^9.39.1",
     "husky": "^9.1.7",
     "prettier": "^3.7.4",
@@ -22,5 +23,8 @@
     "overrides": {
       "vite": "npm:rolldown-vite@7.3.1"
     }
+  },
+  "dependencies": {
+    "recharts": "^3.8.1"
   }
 }

@@ -2,27 +2,28 @@ import { create } from 'zustand';
 
 type ModalType = 'workoutSession' | 'templateEditor' | null;
 
-interface ModalData {
+interface IModalData {
   template?: any;
   [key: string]: any;
 }
 
-interface ModalState {
+interface IModalState {
   activeModal: {
     type: ModalType;
-    data?: ModalData;
+    data?: IModalData;
   };
-  openModal: (modalType: ModalType, data?: ModalData) => void;
+  openModal: (modalType: ModalType, data?: IModalData) => void;
   closeModal: () => void;
   isActive: (modalType: ModalType) => boolean;
 }
 
-export const useModalStore = create<ModalState>((set, get) => ({
+export const useModalStore = create<IModalState>((set, get) => ({
   activeModal: { type: null },
-  
-  openModal: (modalType: ModalType, data?: ModalData) => set({ activeModal: { type: modalType, data } }),
-  
+
+  openModal: (modalType: ModalType, data?: IModalData) =>
+    set({ activeModal: { type: modalType, data } }),
+
   closeModal: () => set({ activeModal: { type: null } }),
-  
+
   isActive: (modalType: ModalType) => get().activeModal.type === modalType,
 }));

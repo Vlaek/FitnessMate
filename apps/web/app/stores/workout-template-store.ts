@@ -1,24 +1,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { WorkoutTemplate } from '../interfaces/workout-template';
+import { IWorkoutTemplate } from '../interfaces/workout-template';
 
-// Legacy storage class for migration purposes
 const LEGACY_WORKOUT_TEMPLATES_KEY = 'workout_templates';
 
-interface WorkoutTemplateState {
-  templates: WorkoutTemplate[];
-  currentTemplate: WorkoutTemplate | null;
+interface IWorkoutTemplateState {
+  templates: IWorkoutTemplate[];
+  currentTemplate: IWorkoutTemplate | null;
   isEditingTemplate: boolean;
-  setTemplates: (templates: WorkoutTemplate[]) => void;
-  addTemplate: (template: WorkoutTemplate) => void;
-  updateTemplate: (template: WorkoutTemplate) => void;
+  setTemplates: (templates: IWorkoutTemplate[]) => void;
+  addTemplate: (template: IWorkoutTemplate) => void;
+  updateTemplate: (template: IWorkoutTemplate) => void;
   deleteTemplate: (id: string) => void;
-  setCurrentTemplate: (template: WorkoutTemplate | null) => void;
+  setCurrentTemplate: (template: IWorkoutTemplate | null) => void;
   setIsEditingTemplate: (editing: boolean) => void;
-  getTemplateById: (id: string) => WorkoutTemplate | undefined;
+  getTemplateById: (id: string) => IWorkoutTemplate | undefined;
 }
 
-export const useWorkoutTemplateStore = create<WorkoutTemplateState>()(
+export const useWorkoutTemplateStore = create<IWorkoutTemplateState>()(
   persist(
     (set, get) => ({
       templates: [],
@@ -34,7 +33,6 @@ export const useWorkoutTemplateStore = create<WorkoutTemplateState>()(
           templates: state.templates.map((t) =>
             t.id === updatedTemplate.id ? updatedTemplate : t,
           ),
-          // If the updated template is the current one being edited, update it too
           currentTemplate:
             state.currentTemplate?.id === updatedTemplate.id
               ? updatedTemplate
@@ -43,7 +41,6 @@ export const useWorkoutTemplateStore = create<WorkoutTemplateState>()(
       deleteTemplate: (id) =>
         set((state) => ({
           templates: state.templates.filter((t) => t.id !== id),
-          // If the deleted template was the current one being edited, clear it
           currentTemplate: state.currentTemplate?.id === id ? null : state.currentTemplate,
         })),
       setCurrentTemplate: (template) => set({ currentTemplate: template }),
@@ -54,20 +51,17 @@ export const useWorkoutTemplateStore = create<WorkoutTemplateState>()(
       },
     }),
     {
-      name: 'workout-template-storage', // name of the item in the storage (must be unique)
+      name: 'workout-template-storage',
       onRehydrateStorage: () => {
-        // Before hydration
         return (state, error) => {
           if (error) {
             console.error('An error happened during hydration', error);
           } else if (state && state.templates.length === 0) {
-            // If the persisted state is empty, try loading from legacy storage
             try {
               const legacyStored = localStorage.getItem(LEGACY_WORKOUT_TEMPLATES_KEY);
               if (legacyStored) {
                 const legacyTemplates = JSON.parse(legacyStored);
                 if (Array.isArray(legacyTemplates) && legacyTemplates.length > 0) {
-                  // Update the state with legacy templates
                   state.setTemplates(legacyTemplates);
                 }
               }
