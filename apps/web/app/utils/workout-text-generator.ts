@@ -65,3 +65,20 @@ export function generateWorkoutText(
 
   return text;
 }
+
+/**
+ * Formats a date string in the DD.MM.YYYY format based on the current language setting
+ * @param date The date to format (string, Date object, or timestamp)
+ * @param t Translation function from react-i18next
+ * @returns Formatted date string in DD.MM.YYYY format
+ */
+export function formatDateDDMMYYYY(date: string | Date, t: TFunction): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  // Format date as DD.MM.YYYY regardless of the language
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+  const year = dateObj.getFullYear();
+  
+  return `${day}.${month}.${year}`;
+}

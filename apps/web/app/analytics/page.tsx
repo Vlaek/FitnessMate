@@ -29,6 +29,7 @@ import {
 import { IWorkoutHistory } from '../interfaces/workout-history';
 import { useExerciseCatalogStore } from '../stores/exercise-catalog-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
+import { formatDateDDMMYYYY } from '../utils/workout-text-generator';
 
 const AnalyticsPage = () => {
   const { t } = useTranslation('common');
@@ -47,7 +48,7 @@ const AnalyticsPage = () => {
   }, [getAllWorkouts]);
 
   const chartData = workoutHistory.map((workout) => ({
-    date: new Date(workout.date).toLocaleDateString(),
+    date: formatDateDDMMYYYY(workout.date, t), // Format as DD.MM.YYYY using utility function
     templateName: workout.templateName,
     exercisesCount: workout.exercises.length,
     totalVolume: workout.exercises.reduce((sum, ex) => {
@@ -79,14 +80,17 @@ const AnalyticsPage = () => {
 
     for (const exerciseName in exerciseMap) {
       if (exerciseMap[exerciseName].length > 1) {
-        return exerciseMap[exerciseName].sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-        );
+        return exerciseMap[exerciseName]
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .map((item) => ({
+            ...item,
+            date: formatDateDDMMYYYY(item.date, t), // Format the date consistently using utility function
+          }));
       }
     }
 
     return workoutHistory.slice(0, 3).map((workout, idx) => ({
-      date: workout.date,
+      date: formatDateDDMMYYYY(workout.date, t), // Format the date for default case as well
       weight: idx * 2.5 + 80,
     }));
   })();
@@ -264,7 +268,7 @@ const AnalyticsPage = () => {
                   <div key={workout.id} className="rounded-lg border border-slate-200 p-4">
                     <div className="flex justify-between">
                       <h4 className="font-medium">{workout.templateName}</h4>
-                      <span className="text-sm text-slate-500">{workout.date}</span>
+                      <span className="text-sm text-slate-500">{formatDateDDMMYYYY(workout.date, t)}</span>
                     </div>
                     <div className="mt-2 flex items-center text-sm text-slate-600">
                       <span>
