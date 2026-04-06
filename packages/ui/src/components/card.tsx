@@ -10,7 +10,7 @@ export function Card({
 }): JSX.Element {
   return (
     <div className={cn('rounded-2xl border border-gray-300 p-3', className)}>
-      <p>{children}</p>
+      <div>{children}</div>
     </div>
   );
 }
