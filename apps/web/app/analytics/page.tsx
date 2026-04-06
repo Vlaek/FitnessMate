@@ -26,23 +26,16 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { IExercise } from '../interfaces/exercise';
+import { IWorkoutHistory } from '../interfaces/workout-history';
 import { useExerciseCatalogStore } from '../stores/exercise-catalog-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
-
-interface WorkoutHistory {
-  id: string;
-  date: string;
-  templateName: string;
-  exercises: IExercise[];
-}
 
 const AnalyticsPage = () => {
   const { t } = useTranslation('common');
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter'>('month');
   const { getAllWorkouts } = useWorkoutHistoryStore();
   const { initializeExercises, exercises } = useExerciseCatalogStore();
-  const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
+  const [workoutHistory, setWorkoutHistory] = useState<IWorkoutHistory[]>([]);
 
   useEffect(() => {
     initializeExercises();
@@ -161,7 +154,7 @@ const AnalyticsPage = () => {
         </div>
 
         <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Card title={t('totalWorkouts')} href="#">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
                 {t('totalWorkouts')}
@@ -173,7 +166,7 @@ const AnalyticsPage = () => {
             </CardContent>
           </Card>
 
-          <Card title={t('totalVolume')} href="#">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
                 {t('totalVolume')}
@@ -181,27 +174,15 @@ const AnalyticsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {chartData.reduce((sum, d) => sum + d.totalVolume, 0)} kg
+                {chartData.reduce((sum, d) => sum + d.totalVolume, 0)} {t('kg')}
               </div>
               <p className="text-xs text-slate-500">{t('lifted')}</p>
-            </CardContent>
-          </Card>
-
-          <Card title={t('consistency')} href="#">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                {t('consistency')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">85%</div>
-              <p className="text-xs text-slate-500">{t('goalAchieved')}</p>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Card title={t('trainingVolumeOverTime')} href="#">
+          <Card>
             <CardHeader>
               <CardTitle>{t('trainingVolumeOverTime')}</CardTitle>
             </CardHeader>
@@ -225,7 +206,7 @@ const AnalyticsPage = () => {
             </CardContent>
           </Card>
 
-          <Card title={t('progressTracking')} href="#">
+          <Card>
             <CardHeader>
               <CardTitle>{t('progressTracking')}</CardTitle>
             </CardHeader>
@@ -243,35 +224,37 @@ const AnalyticsPage = () => {
             </CardContent>
           </Card>
 
-          <Card title={t('muscleGroupDistribution')} href="#">
-            <CardHeader>
-              <CardTitle>{t('muscleGroupDistribution')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={muscleGroupData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
-                  >
-                    {muscleGroupData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {muscleGroupData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('muscleGroupDistribution')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={muscleGroupData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                    >
+                      {muscleGroupData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
 
-          <Card title={t('recentWorkouts')} href="#">
+          <Card>
             <CardHeader>
               <CardTitle>{t('recentWorkouts')}</CardTitle>
             </CardHeader>
