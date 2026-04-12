@@ -8,8 +8,6 @@ const nextConfig = {
   },
   // Enable compression for faster loading
   compress: true,
-  // Optimize output for Vercel deployment
-  output: 'standalone',
 };
 
 export default nextConfig;

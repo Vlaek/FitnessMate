@@ -22,35 +22,21 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Deploy on Vercel
 
-To deploy this application on Vercel, you have two options:
+To deploy this application on Vercel, we recommend using the Vercel Web UI:
 
-### Option 1: Using Vercel CLI
+### Connect your Git Repository (Recommended)
 
-1. Install the Vercel CLI:
-```bash
-npm i -g vercel
-```
-
-2. Navigate to the web app directory:
-```bash
-cd apps/web
-```
-
-3. Run the deploy command:
-```bash
-vercel --prod
-```
-
-### Option 2: Connect your Git Repository
-
-1. Push this repository to GitHub
+1. Push this repository to GitHub/GitLab/Bitbucket
 2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-3. Click "Add New Project"
-4. Import your project from GitHub
-5. Configure your project:
-   - Framework Preset: Next.js
-   - Root Directory: `apps/web`
-6. Click "Deploy"
+3. Click "Add New Project" and import your project
+4. In project settings, configure:
+   - **FRAMEWORK PRESET**: Auto-detected (Next.js)
+   - **ROOT DIRECTORY**: `apps/web` (important to set this!)
+   - **BUILD COMMAND**: `cd ../.. && pnpm --dir apps/web run build`
+   - **OUTPUT DIRECTORY**: `apps/web/.next`
+5. Click "Deploy"
+
+⚠️ **Note:** Due to monorepo complexity, CLI deployment (`vercel --prod`) may fail with "Command 'npm install' exited with 1". If this occurs, use the Vercel Web UI approach as described above.
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 

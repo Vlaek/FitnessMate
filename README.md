@@ -1,6 +1,55 @@
-# Turborepo starter
+# FitnessMate Turborepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+This is a [Turborepo](https://turbo.dev/repo)-powered monorepo for the FitnessMate application.
+
+## Deployment on Vercel
+
+To deploy the FitnessMate web application on Vercel:
+
+### Prerequisites
+
+1. Create a Vercel account at [vercel.com](https://vercel.com)
+2. Make sure your repository is connected to Vercel
+
+### Deployment Steps
+
+1. The web application is located in the `apps/web` directory
+2. When setting up your project on Vercel, configure the following:
+   - **Root Directory**: Set to `apps/web`
+   - **Framework Preset**: Next.js will be detected automatically
+   - **Build Command**: `pnpm run build`
+   - **Output Directory**: `apps/web/.next`
+
+3. Environment Variables (if needed):
+   - Add any required environment variables in the Vercel dashboard
+
+4. Advanced Configuration:
+   - A `vercel.json` file is included in `apps/web/` directory for advanced configuration
+
+### Using Vercel CLI
+
+Alternatively, you can deploy using the Vercel CLI:
+
+1. Install the Vercel CLI globally:
+   ```bash
+   npm install -g vercel
+   ```
+
+2. Navigate to the web app directory:
+   ```bash
+   cd apps/web
+   ```
+
+3. Run the deploy command:
+   ```bash
+   vercel --prod
+   ```
+
+### Notes
+
+- This is a monorepo managed with Turborepo
+- The main application is built with Next.js 16 using the App Router
+- Make sure to point Vercel to the `apps/web` directory specifically, not the root of the monorepo
 
 ## Using this example
 
