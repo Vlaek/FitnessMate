@@ -2,8 +2,6 @@
 
 import { MainHeader } from './components/main-header';
 import { TelegramIntegrationSection } from './components/telegram-integration-section';
-import { TemplateEditorDialog } from './components/template-editor-dialog';
-import { WorkoutSessionDialog } from './components/workout-session-dialog';
 import { WorkoutTemplatesSection } from './components/workout-templates-section';
 
 export default function HomePage() {
@@ -15,10 +13,6 @@ export default function HomePage() {
         <TelegramIntegrationSection />
 
         <WorkoutTemplatesSection />
-
-        <WorkoutSessionDialog />
-
-        <TemplateEditorDialog />
       </div>
     </div>
   );

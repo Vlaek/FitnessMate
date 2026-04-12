@@ -5,13 +5,18 @@ export function generateWorkoutText(
   t: TFunction,
   exercises: IExercise[],
   description: string,
+  bodyWeight?: string,
   templateName?: string,
   useWeekdayPrefix?: boolean,
+  useWorkoutDatePrefix?: boolean,
+  useEmptyLinesBetweenSections: boolean = true,
+  useTotalWorkload: boolean = false,
 ): string {
-  let text = '';
+  const sections: string[] = [];
   const hasExercises = exercises.some((item) => item.name.length > 0);
+  const sectionSeparator = useEmptyLinesBetweenSections ? '\n\n' : '\n';
 
-  if (useWeekdayPrefix) {
+  if (useWeekdayPrefix || useWorkoutDatePrefix) {
     const days = [
       t('sunday'),
       t('monday'),
@@ -22,48 +27,87 @@ export function generateWorkoutText(
       t('saturday'),
     ];
     const today = new Date();
-    text += `${days[today.getDay()]}\n\n`;
+    const dayPart = useWeekdayPrefix ? days[today.getDay()] || '' : '';
+    const datePart = useWorkoutDatePrefix
+      ? `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`
+      : '';
+
+    if (dayPart && datePart) {
+      sections.push(`${dayPart} - ${datePart}`);
+    } else if (dayPart || datePart) {
+      sections.push(dayPart || datePart);
+    }
   }
 
   if (templateName?.trim()) {
-    text += `${templateName}\n\n`;
+    sections.push(templateName.trim());
   }
 
   if (description.trim()) {
-    text += `${description}\n\n`;
+    sections.push(description.trim());
   }
 
-  if (!hasExercises) {
-    return text;
+  const parsedBodyWeight = bodyWeight?.trim() ? Number(bodyWeight) : NaN;
+  if (Number.isFinite(parsedBodyWeight) && parsedBodyWeight > 0) {
+    sections.push(`${t('bodyWeight')}: ${bodyWeight?.trim()} ${t('kg')}`);
   }
 
-  text += `${t('exercises')}:\n`;
+  if (hasExercises) {
+    const exerciseLines: string[] = [];
+    let totalWorkload = 0;
+    let hasWorkloadData = false;
 
-  exercises.forEach((ex, index) => {
-    if (ex.name) {
-      text += `${index + 1}. ${ex.name || t('enterExerciseName')}`;
+    exercises.forEach((ex, index) => {
+      if (!ex.name) return;
 
-      if (!ex.sets.length && !ex.weight) {
-        text += '\n';
+      const exerciseDisplayName = t(ex.name, { defaultValue: ex.name || t('enterExerciseName') });
+      let exerciseLine = `${index + 1}. ${exerciseDisplayName}`;
+
+      const detailsParts: string[] = [];
+      if (ex.sets?.length) {
+        detailsParts.push(ex.sets);
+      }
+      if (ex.reps?.length) {
+        detailsParts.push(ex.reps);
+      }
+      if (ex.weight) {
+        detailsParts.push(`${ex.weight} ${t('kg')}`);
       }
 
-      if (ex.sets.length || ex.weight) {
-        text += ' - ';
+      if (detailsParts.length > 0) {
+        exerciseLine += ` - ${detailsParts.join(' x ')}`;
+      }
 
-        if (ex.sets.length) {
-          text += `${ex.sets} `;
-        }
+      const parsedSets = Number(ex.sets);
+      const parsedReps = Number(ex.reps);
+      const parsedWeight = Number(ex.weight);
+      if (
+        Number.isFinite(parsedSets) &&
+        Number.isFinite(parsedReps) &&
+        Number.isFinite(parsedWeight) &&
+        parsedSets > 0 &&
+        parsedReps > 0 &&
+        parsedWeight > 0
+      ) {
+        totalWorkload += parsedSets * parsedReps * parsedWeight;
+        hasWorkloadData = true;
+      }
 
-        if (ex.weight) {
-          text += ex.sets.length ? `x ${ex.weight} ${t('kg')}` : `${ex.weight} ${t('kg')}`;
-        }
+      exerciseLines.push(exerciseLine);
+    });
 
-        text += '\n';
+    if (exerciseLines.length > 0) {
+      if (useTotalWorkload && hasWorkloadData) {
+        sections.push(
+          `${exerciseLines.join('\n')}\n\n${t('totalWorkload')}: ${totalWorkload.toLocaleString()} ${t('kg')}`,
+        );
+      } else {
+        sections.push(exerciseLines.join('\n'));
       }
     }
-  });
+  }
 
-  return text;
+  return sections.join(sectionSeparator);
 }
 
 /**

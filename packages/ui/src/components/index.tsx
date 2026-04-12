@@ -3,6 +3,8 @@ export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export { Checkbox } from './checkbox';
 export { Code } from './code';
 export { Combobox } from './combobox';
+export { ConfirmDialog } from './confirm-dialog';
+export { DatePicker } from './date-picker';
 export {
   Dialog,
   DialogContent,

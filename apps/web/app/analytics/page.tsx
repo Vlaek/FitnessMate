@@ -1,19 +1,11 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@repo/ui/components/select';
+import { Button } from '@repo/ui/components/button';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
   Cell,
   Legend,
@@ -26,7 +18,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { IWorkoutHistory } from '../interfaces/workout-history';
 import { useExerciseCatalogStore } from '../stores/exercise-catalog-store';
 import { useModalStore } from '../stores/modal-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
@@ -34,20 +25,13 @@ import { formatDateDDMMYYYY } from '../utils/workout-text-generator';
 
 const AnalyticsPage = () => {
   const { t } = useTranslation('common');
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter'>('month');
-  const { getAllWorkouts } = useWorkoutHistoryStore();
+  const workoutHistory = useWorkoutHistoryStore((state) => state.history);
   const { initializeExercises, exercises } = useExerciseCatalogStore();
-  const [workoutHistory, setWorkoutHistory] = useState<IWorkoutHistory[]>([]);
   const { openModal } = useModalStore();
 
   useEffect(() => {
     initializeExercises();
   }, [initializeExercises]);
-
-  useEffect(() => {
-    const history = getAllWorkouts();
-    setWorkoutHistory(history);
-  }, [getAllWorkouts]);
 
   const chartData = workoutHistory.map((workout) => ({
     date: formatDateDDMMYYYY(workout.date, t),
@@ -55,47 +39,11 @@ const AnalyticsPage = () => {
     exercisesCount: workout.exercises.length,
     totalVolume: workout.exercises.reduce((sum, ex) => {
       const sets = parseInt(ex.sets) || 0;
+      const reps = parseInt(ex.reps || '') || 1;
       const weight = ex.weight || 0;
-      return sum + sets * weight;
+      return sum + sets * reps * weight;
     }, 0),
   }));
-
-  const exerciseProgressData = (() => {
-    const exerciseMap: Record<string, { date: string; weight: number }[]> = {};
-
-    workoutHistory.forEach((workout) => {
-      workout.exercises.forEach((exercise) => {
-        if (exercise.weight && exercise.name) {
-          const weight = exercise.weight;
-          if (weight > 0) {
-            if (!exerciseMap[exercise.name]) {
-              exerciseMap[exercise.name] = [];
-            }
-            exerciseMap[exercise.name].push({
-              date: workout.date,
-              weight: weight,
-            });
-          }
-        }
-      });
-    });
-
-    for (const exerciseName in exerciseMap) {
-      if (exerciseMap[exerciseName].length > 1) {
-        return exerciseMap[exerciseName]
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          .map((item) => ({
-            ...item,
-            date: formatDateDDMMYYYY(item.date, t),
-          }));
-      }
-    }
-
-    return workoutHistory.slice(0, 3).map((workout, idx) => ({
-      date: formatDateDDMMYYYY(workout.date, t),
-      weight: idx * 2.5 + 80,
-    }));
-  })();
 
   const muscleGroupData = (() => {
     const muscleGroups: Record<string, number> = {};
@@ -126,6 +74,28 @@ const AnalyticsPage = () => {
   })();
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const recentWorkouts = [...workoutHistory]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+
+  if (workoutHistory.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8">
+        <div className="container mx-auto max-w-4xl px-4">
+          <h1 className="mb-8 text-3xl font-bold text-slate-800">{t('workoutAnalytics')}</h1>
+          <Card className="border-dashed border-slate-300">
+            <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
+              <h2 className="text-2xl font-semibold text-slate-800">{t('noWorkoutsForAnalytics')}</h2>
+              <p className="max-w-lg text-slate-500">{t('addFirstWorkoutForAnalytics')}</p>
+              <Button type="button" onClick={() => openModal('workoutHistoryCreate')}>
+                {t('addWorkout')}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">
@@ -139,17 +109,6 @@ const AnalyticsPage = () => {
           </div>
 
           <div className="flex gap-3">
-            <Select value={timeRange} onValueChange={(value) => setTimeRange(value as any)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('selectTimeRange')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="week">{t('lastWeek')}</SelectItem>
-                <SelectItem value="month">{t('lastMonth')}</SelectItem>
-                <SelectItem value="quarter">{t('lastQuarter')}</SelectItem>
-              </SelectContent>
-            </Select>
-
             <Link
               href="/"
               className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
@@ -212,24 +171,6 @@ const AnalyticsPage = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('progressTracking')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={exerciseProgressData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="weight" name={t('weightKg')} fill="#8b5cf6" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
           {muscleGroupData.length > 0 && (
             <Card>
               <CardHeader>
@@ -260,16 +201,21 @@ const AnalyticsPage = () => {
             </Card>
           )}
 
-          <Card>
+          <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>{t('recentWorkouts')}</CardTitle>
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle>{t('recentWorkouts')}</CardTitle>
+                <Button type="button" size="sm" onClick={() => openModal('workoutHistoryCreate')}>
+                  {t('addWorkout')}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {workoutHistory.slice(-5).map((workout) => (
+              <div className="flex flex-wrap gap-4">
+                {recentWorkouts.map((workout) => (
                   <div
                     key={workout.id}
-                    className="cursor-pointer rounded-lg border border-slate-200 p-4 transition-all hover:border-blue-400 hover:bg-blue-50/30"
+                    className="w-full cursor-pointer rounded-lg border border-slate-200 p-4 transition-all hover:border-blue-400 hover:bg-blue-50/30 md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.75rem)]"
                     onClick={() => openModal('workoutHistoryDetail', { workoutHistory: workout })}
                   >
                     <div className="flex justify-between">

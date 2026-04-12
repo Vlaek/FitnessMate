@@ -2,6 +2,7 @@ import { Toaster } from '@repo/ui/components/sonner';
 import '@repo/ui/globals.css';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { AppFooter } from './components/app-footer';
 import I18nProvider from './providers/i18n-provider';
 
 const geistSans = localFont({
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <I18nProvider>
           {children}
+          <AppFooter />
           <Toaster />
         </I18nProvider>
       </body>

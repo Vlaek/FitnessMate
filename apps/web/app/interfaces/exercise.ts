@@ -2,6 +2,7 @@ export interface IExercise {
   id: string;
   name: string;
   sets: string;
+  reps?: string;
   weight: number;
   muscleGroup?: string;
 }

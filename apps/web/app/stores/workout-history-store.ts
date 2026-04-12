@@ -12,6 +12,11 @@ interface IWorkoutHistoryEntry {
 interface WorkoutHistoryState {
   history: IWorkoutHistoryEntry[];
   addWorkoutToHistory: (workout: Omit<IWorkoutHistoryEntry, 'id'>) => void;
+  updateWorkoutInHistory: (
+    id: string,
+    workout: Omit<IWorkoutHistoryEntry, 'id' | 'date'> & { date?: string },
+  ) => void;
+  deleteWorkoutFromHistory: (id: string) => void;
   getRecentWorkouts: (count: number) => IWorkoutHistoryEntry[];
   getAllWorkouts: () => IWorkoutHistoryEntry[];
 }
@@ -30,6 +35,24 @@ export const useWorkoutHistoryStore = create<WorkoutHistoryState>()(
 
         set((state) => ({
           history: [newWorkout, ...state.history],
+        }));
+      },
+      updateWorkoutInHistory: (id, workout) => {
+        set((state) => ({
+          history: state.history.map((entry) =>
+            entry.id === id
+              ? {
+                  ...entry,
+                  ...workout,
+                  date: workout.date || entry.date,
+                }
+              : entry,
+          ),
+        }));
+      },
+      deleteWorkoutFromHistory: (id) => {
+        set((state) => ({
+          history: state.history.filter((entry) => entry.id !== id),
         }));
       },
       getRecentWorkouts: (count: number) => {

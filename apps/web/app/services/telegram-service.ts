@@ -39,4 +39,37 @@ export class TelegramService {
       return false;
     }
   }
+
+  static async sendPhoto(imagePath: string, chatId: string): Promise<boolean> {
+    const token = this.getToken();
+
+    if (!token) {
+      throw new Error('Telegram token is not set');
+    }
+
+    try {
+      const imageResponse = await fetch(imagePath);
+      if (!imageResponse.ok) {
+        return false;
+      }
+
+      const imageBlob = await imageResponse.blob();
+      const fileName = imagePath.split('/').pop() || 'image.jpg';
+
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('photo', imageBlob, fileName);
+
+      const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      return result.ok;
+    } catch (error) {
+      console.error('Error sending Telegram photo:', error);
+      return false;
+    }
+  }
 }

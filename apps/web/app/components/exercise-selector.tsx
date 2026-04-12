@@ -8,10 +8,11 @@ import { useExerciseCatalogStore } from '../stores/exercise-catalog-store';
 interface IProps {
   value: string;
   placeholder?: string;
+  className?: string;
   onChange: (exerciseNameKey: string) => void;
 }
 
-export function ExerciseSelector({ value, placeholder, onChange }: IProps) {
+export function ExerciseSelector({ value, placeholder, className, onChange }: IProps) {
   const { t } = useTranslation('common');
   const { exercises, initialized, initializeExercises } = useExerciseCatalogStore();
 
@@ -36,6 +37,7 @@ export function ExerciseSelector({ value, placeholder, onChange }: IProps) {
       value={value}
       onChange={onChange}
       placeholder={placeholder || t('enterExerciseName')}
+      className={className || 'w-[260px] max-w-[260px]'}
     />
   );
 }

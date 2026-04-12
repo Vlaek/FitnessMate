@@ -26,7 +26,9 @@ export function WorkoutTemplatesSection() {
     setCurrentTemplate({
       name: '',
       description: '',
-      exercises: [{ id: Math.random().toString(36).substr(2, 9), name: '', sets: '3', weight: 0 }],
+      exercises: [
+        { id: Math.random().toString(36).substr(2, 9), name: '', sets: '3', reps: '10', weight: 0 },
+      ],
     });
     setIsEditingTemplate(true);
     openModal('templateEditor');
@@ -35,7 +37,7 @@ export function WorkoutTemplatesSection() {
   const handleEditTemplate = (template: IWorkoutTemplate) => {
     setCurrentTemplate({ ...template });
     setIsEditingTemplate(true);
-    openModal('templateEditor');
+    openModal('templateEditor', { template });
   };
 
   return (

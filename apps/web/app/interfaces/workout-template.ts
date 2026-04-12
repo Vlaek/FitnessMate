@@ -4,6 +4,12 @@ export interface IWorkoutTemplate {
   id?: string;
   name: string;
   description: string;
+  bodyWeight?: string;
   exercises: IExercise[];
   useWeekdayPrefix?: boolean;
+  useWorkoutDatePrefix?: boolean;
+  useEmptyLinesBetweenSections?: boolean;
+  useTotalWorkload?: boolean;
+  useRandomImage?: boolean;
+  randomImagePath?: string;
 }
