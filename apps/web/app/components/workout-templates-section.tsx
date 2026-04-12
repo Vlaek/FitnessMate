@@ -1,5 +1,7 @@
 import { Button } from '@repo/ui/components/button';
 import { CardContent } from '@repo/ui/components/card';
+import { ConfirmDialog } from '@repo/ui/components/confirm-dialog';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IWorkoutTemplate } from '../interfaces/workout-template';
 import { useModalStore } from '../stores/modal-store';
@@ -7,14 +9,23 @@ import { useWorkoutTemplateStore } from '../stores/workout-template-store';
 
 export function WorkoutTemplatesSection() {
   const { t } = useTranslation('common');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
 
   const { templates, deleteTemplate, setCurrentTemplate, setIsEditingTemplate } =
     useWorkoutTemplateStore();
   const { openModal } = useModalStore();
 
   const handleDeleteTemplate = (id: string) => {
-    if (confirm(t('areYouSureYouWantToDeleteThisTemplate'))) {
-      deleteTemplate(id);
+    setTemplateToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (templateToDelete) {
+      deleteTemplate(templateToDelete);
+      setIsDeleteConfirmOpen(false);
+      setTemplateToDelete(null);
     }
   };
 
@@ -101,6 +112,17 @@ export function WorkoutTemplatesSection() {
           </div>
         )}
       </CardContent>
+
+      <ConfirmDialog
+        open={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
+        title={t('areYouSureYouWantToDeleteThisTemplate')}
+        description={t('deleteWorkoutConfirmationDescription')}
+        cancelText={t('cancel')}
+        confirmText={t('delete')}
+        confirmVariant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

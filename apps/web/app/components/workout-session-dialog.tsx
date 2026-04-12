@@ -213,12 +213,10 @@ export function WorkoutSessionDialog() {
             toast.error(t('noImagesFoundInFolder'));
             success = false;
           } else {
-            success = await TelegramService.sendPhoto(imagePathToSend, chatId);
+            success = await TelegramService.sendPhoto(imagePathToSend, chatId, report);
           }
-        }
-
-        if (success) {
-          success = await TelegramService.sendMessage(report, chatId);
+        } else {
+            success = await TelegramService.sendMessage(report, chatId);
         }
 
         if (success) {
@@ -523,7 +521,8 @@ export function WorkoutSessionDialog() {
             <Button
               type="button"
               onClick={() => void handleSaveAndSend()}
-              className="w-full bg-green-600 text-white hover:bg-green-700"
+              className="w-full"
+              variant="default"
             >
               {t('saveAndSend')}
             </Button>

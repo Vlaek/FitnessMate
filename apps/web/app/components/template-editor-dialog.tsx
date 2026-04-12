@@ -437,7 +437,6 @@ export function TemplateEditorDialog() {
                 </table>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -458,17 +457,15 @@ export function TemplateEditorDialog() {
             />
             <p className="mt-2 text-xs text-slate-500">{t('previewDescription')}</p>
 
-            <div className="sticky bottom-0 mt-4 flex justify-end bg-white pt-3">
-              <Button type="button" variant="outline" onClick={handleReset} className="mr-2">
-                {t('reset')}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSave}
-                className="bg-blue-600 text-white hover:bg-blue-700"
-              >
-                {t('saveTemplate')}
-              </Button>
+            <div className="sticky bottom-0 mt-4 space-y-2 bg-white pt-3">
+              <div className="grid grid-cols-2 gap-2">
+                <Button type="button" variant="outline" onClick={handleReset} className="w-full">
+                  {t('reset')}
+                </Button>
+                <Button type="button" onClick={handleSave} variant="default" className="w-full">
+                  {t('saveTemplate')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

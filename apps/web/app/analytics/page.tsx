@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/card';
 import { Button } from '@repo/ui/components/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/card';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -82,10 +82,22 @@ const AnalyticsPage = () => {
     return (
       <div className="min-h-screen bg-slate-50 py-8">
         <div className="container mx-auto max-w-4xl px-4">
-          <h1 className="mb-8 text-3xl font-bold text-slate-800">{t('workoutAnalytics')}</h1>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <h1 className="text-3xl font-bold text-slate-800">{t('workoutAnalytics')}</h1>
+
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+            >
+              {t('goToHomePage')}
+            </Link>
+          </div>
+
           <Card className="border-dashed border-slate-300">
             <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
-              <h2 className="text-2xl font-semibold text-slate-800">{t('noWorkoutsForAnalytics')}</h2>
+              <h2 className="text-2xl font-semibold text-slate-800">
+                {t('noWorkoutsForAnalytics')}
+              </h2>
               <p className="max-w-lg text-slate-500">{t('addFirstWorkoutForAnalytics')}</p>
               <Button type="button" onClick={() => openModal('workoutHistoryCreate')}>
                 {t('addWorkout')}

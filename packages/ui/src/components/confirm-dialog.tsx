@@ -26,7 +26,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogHeader className="space-y-3 pr-10">
           <DialogTitle className="leading-relaxed">{title}</DialogTitle>
           {description ? (

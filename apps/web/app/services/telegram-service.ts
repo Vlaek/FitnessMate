@@ -40,7 +40,7 @@ export class TelegramService {
     }
   }
 
-  static async sendPhoto(imagePath: string, chatId: string): Promise<boolean> {
+  static async sendPhoto(imagePath: string, chatId: string, caption: string): Promise<boolean> {
     const token = this.getToken();
 
     if (!token) {
@@ -59,6 +59,7 @@ export class TelegramService {
       const formData = new FormData();
       formData.append('chat_id', chatId);
       formData.append('photo', imageBlob, fileName);
+      formData.append('caption', caption);
 
       const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: 'POST',
