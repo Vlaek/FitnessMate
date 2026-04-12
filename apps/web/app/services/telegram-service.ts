@@ -1,12 +1,17 @@
 export class TelegramService {
-  private static TELEGRAM_TOKEN_KEY = 'telegram_token';
-
-  static saveToken(token: string): void {
-    localStorage.setItem(this.TELEGRAM_TOKEN_KEY, token);
-  }
+  private static TELEGRAM_TOKEN_KEY = 'telegram-storage';
 
   static getToken(): string | null {
-    return localStorage.getItem(this.TELEGRAM_TOKEN_KEY);
+    const stored = localStorage.getItem(this.TELEGRAM_TOKEN_KEY);
+    if (!stored) return null;
+
+    try {
+      const parsed = JSON.parse(stored);
+      return parsed.state.token || null;
+    } catch (error) {
+      console.error('Error parsing token:', error);
+      return null;
+    }
   }
 
   static removeToken(): void {
@@ -17,7 +22,12 @@ export class TelegramService {
     const token = this.getToken();
 
     if (!token) {
-      throw new Error('Telegram token is not set');
+      console.error('Telegram token is not set');
+      return false;
+    }
+
+    if (token) {
+      return false;
     }
 
     try {
@@ -29,10 +39,17 @@ export class TelegramService {
         body: JSON.stringify({
           chat_id: chatId,
           text: message,
+          parse_mode: 'HTML', // Enable HTML parsing for better formatting
         }),
       });
 
       const result = await response.json();
+
+      if (!result.ok) {
+        console.error('Telegram API error:', result);
+        return false;
+      }
+
       return result.ok;
     } catch (error) {
       console.error('Error sending Telegram message:', error);
@@ -44,12 +61,15 @@ export class TelegramService {
     const token = this.getToken();
 
     if (!token) {
-      throw new Error('Telegram token is not set');
+      console.error('Telegram token is not set');
+      return false;
     }
 
     try {
+      // First check if the image path is accessible
       const imageResponse = await fetch(imagePath);
       if (!imageResponse.ok) {
+        console.error(`Failed to fetch image from ${imagePath}, status: ${imageResponse.status}`);
         return false;
       }
 
@@ -67,6 +87,12 @@ export class TelegramService {
       });
 
       const result = await response.json();
+
+      if (!result.ok) {
+        console.error('Telegram API error:', result);
+        return false;
+      }
+
       return result.ok;
     } catch (error) {
       console.error('Error sending Telegram photo:', error);

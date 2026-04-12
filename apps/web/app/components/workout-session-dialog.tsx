@@ -198,15 +198,16 @@ export function WorkoutSessionDialog() {
 
     if (isConfigured() && chatId) {
       try {
-        let success = true;
         let imagePathToSend = randomImagePath;
 
         if (useRandomImage && !imagePathToSend) {
-          imagePathToSend = await RandomImageService.getRandomImage() || '';
+          imagePathToSend = (await RandomImageService.getRandomImage()) || '';
           if (imagePathToSend) {
             setRandomImagePath(imagePathToSend);
           }
         }
+
+        let success: boolean;
 
         if (useRandomImage) {
           if (!imagePathToSend) {
@@ -216,17 +217,21 @@ export function WorkoutSessionDialog() {
             success = await TelegramService.sendPhoto(imagePathToSend, chatId, report);
           }
         } else {
-            success = await TelegramService.sendMessage(report, chatId);
+          success = await TelegramService.sendMessage(chatId, report);
         }
 
         if (success) {
           toast.success(t('workoutReportSentToTelegramSuccessfully'));
         } else {
-          toast.error(t('failedToSendWorkoutReportToTelegram'));
+          if (useRandomImage) {
+            toast.error(t('failedToSendWorkoutReportWithImageToTelegram'));
+          } else {
+            toast.error(t('failedToSendWorkoutReportToTelegram'));
+          }
         }
-      } catch (error) {
-        console.error('Error sending report:', error);
-        toast.error(t('errorSendingWorkoutReportToTelegram'));
+      } catch (networkError) {
+        console.error('Network error sending report:', networkError);
+        toast.error(t('networkErrorSendingWorkoutReportToTelegram'));
       }
     } else {
       toast.error(t('pleaseConfigureYourTelegramTokenAndChatIDToSendReports'));
@@ -490,7 +495,6 @@ export function WorkoutSessionDialog() {
               </div>
             </div>
           </div>
-
         </div>
 
         <div className="sticky top-0 h-full max-h-[calc(100vh-16rem)] border-l border-slate-200 pl-6">
