@@ -6,6 +6,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Enable compression for faster loading
+  compress: true,
+  // Optimize output for Vercel deployment
+  output: 'standalone',
 };
 
 export default nextConfig;
