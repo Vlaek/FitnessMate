@@ -3,6 +3,8 @@ import { CardContent, CardFooter } from '@repo/ui/components/card';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import { toast } from '@repo/ui/toast';
+import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTelegramStore } from '../stores/telegram-store';
 
@@ -16,6 +18,8 @@ export function TelegramIntegrationSection() {
     resetToken,
     isConfigured,
   } = useTelegramStore();
+
+  const [showToken, setShowToken] = useState(false);
 
   const handleSaveToken = () => {
     setToken(telegramToken);
@@ -39,14 +43,24 @@ export function TelegramIntegrationSection() {
             <Label htmlFor="token" className="text-slate-700">
               {t('botToken')}
             </Label>
-            <Input
-              id="token"
-              type="password"
-              value={telegramToken}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder={t('enterYourTelegramBotToken')}
-              className="mt-1 w-full rounded-lg border border-slate-300 p-3"
-            />
+            <div className="relative mt-1">
+              <Input
+                id="token"
+                type={showToken ? 'text' : 'password'}
+                value={telegramToken}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder={t('enterYourTelegramBotToken')}
+                className="w-full rounded-lg border border-slate-300 p-3 pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-500"
+                onClick={() => setShowToken(!showToken)}
+                aria-label={showToken ? t('hideToken') : t('showToken')}
+              >
+                {showToken ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <div>
             <Label htmlFor="chatId" className="text-slate-700">

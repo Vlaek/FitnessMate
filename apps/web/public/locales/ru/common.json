@@ -159,5 +159,7 @@
   "telegramTokenSavedSuccessfully": "Токен Telegram успешно сохранен",
   "telegramTokenRemoved": "Токен Telegram удален",
   "footerDescription": "помогает создавать тренировки, отслеживать прогресс и отправлять отчеты в Telegram.",
-  "footerGithubAria": "Профиль GitHub: Vlaek"
+  "footerGithubAria": "Профиль GitHub: Vlaek",
+  "showToken": "Показать токен",
+  "hideToken": "Скрыть токен"
 }

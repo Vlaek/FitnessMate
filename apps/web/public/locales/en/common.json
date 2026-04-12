@@ -159,5 +159,7 @@
   "telegramTokenSavedSuccessfully": "Telegram token saved successfully",
   "telegramTokenRemoved": "Telegram token removed",
   "footerDescription": "helps you build workout routines, track progress, and share reports with Telegram.",
-  "footerGithubAria": "GitHub profile: Vlaek"
+  "footerGithubAria": "GitHub profile: Vlaek",
+  "showToken": "Show token",
+  "hideToken": "Hide token"
 }
