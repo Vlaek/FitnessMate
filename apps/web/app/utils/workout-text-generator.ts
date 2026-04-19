@@ -6,6 +6,8 @@ export function generateWorkoutText(
   exercises: IExercise[],
   description: string,
   bodyWeight?: string,
+  bodyFatPercentage?: string,
+  muscleMassKg?: string,
   templateName?: string,
   useWeekdayPrefix?: boolean,
   useWorkoutDatePrefix?: boolean,
@@ -50,6 +52,16 @@ export function generateWorkoutText(
   const parsedBodyWeight = bodyWeight?.trim() ? Number(bodyWeight) : NaN;
   if (Number.isFinite(parsedBodyWeight) && parsedBodyWeight > 0) {
     sections.push(`${t('bodyWeight')}: ${bodyWeight?.trim()} ${t('kg')}`);
+  }
+
+  const parsedBodyFatPercentage = bodyFatPercentage?.trim() ? Number(bodyFatPercentage) : NaN;
+  if (Number.isFinite(parsedBodyFatPercentage) && parsedBodyFatPercentage >= 0) {
+    sections.push(`${t('bodyFatPercentage')}: ${bodyFatPercentage?.trim()}${t('percent')}`);
+  }
+
+  const parsedMuscleMassKg = muscleMassKg?.trim() ? Number(muscleMassKg) : NaN;
+  if (Number.isFinite(parsedMuscleMassKg) && parsedMuscleMassKg >= 0) {
+    sections.push(`${t('muscleMassKg')}: ${muscleMassKg?.trim()} ${t('kg')}`);
   }
 
   if (hasExercises) {
