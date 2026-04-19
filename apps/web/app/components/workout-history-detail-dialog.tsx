@@ -301,7 +301,10 @@ export function WorkoutHistoryDetailDialog() {
                 >
                   {t('cancel')}
                 </Button>
-                <Button type="button" onClick={handleSaveWorkout} className="w-full">
+                <Button
+                  onClick={handleSaveWorkout}
+                  className="w-full bg-blue-500 hover:bg-blue-600"
+                >
                   {t('save')}
                 </Button>
               </>

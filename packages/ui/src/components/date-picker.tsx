@@ -74,9 +74,7 @@ export function DatePicker({
   }).format(visibleMonth);
 
   const weekdayLabels = WEEK_DAYS.map((weekday) =>
-    new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(
-      new Date(2024, 0, 7 + weekday),
-    ),
+    new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(new Date(2024, 0, 7 + weekday)),
   );
 
   const monthStart = getMonthStart(visibleMonth);
@@ -163,6 +161,7 @@ export function DatePicker({
                   'h-8 px-0 text-xs',
                   !isCurrentMonth && 'text-slate-400',
                   isToday && !isSelected && 'border border-slate-300',
+                  isSelected ? 'bg-blue-500 hover:bg-blue-600' : '',
                 )}
                 onClick={() => {
                   onChange(dayValue);
@@ -180,7 +179,7 @@ export function DatePicker({
             type="button"
             variant="outline"
             size="sm"
-            className="w-full"
+            className="w-full bg-blue-500 hover:bg-blue-600"
             onClick={() => onChange(toInputValue(new Date()))}
           >
             {todayLabel}

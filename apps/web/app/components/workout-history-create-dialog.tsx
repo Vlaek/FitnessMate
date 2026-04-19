@@ -222,7 +222,7 @@ export function WorkoutHistoryCreateDialog() {
             <Button type="button" variant="outline" onClick={closeModal} className="w-full">
               {t('cancel')}
             </Button>
-            <Button type="button" onClick={handleSave} className="w-full">
+            <Button onClick={handleSave} className="w-full bg-blue-500 hover:bg-blue-600">
               {t('save')}
             </Button>
           </div>

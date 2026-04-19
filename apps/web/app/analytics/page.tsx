@@ -324,7 +324,7 @@ const AnalyticsPage = () => {
                       dataKey="value"
                       label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                     >
-                      {muscleGroupData.map((entry, index) => (
+                      {muscleGroupData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -340,7 +340,11 @@ const AnalyticsPage = () => {
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <CardTitle>{t('recentWorkouts')}</CardTitle>
-                <Button type="button" size="sm" onClick={() => openModal('workoutHistoryCreate')}>
+                <Button
+                  className="bg-blue-500 hover:bg-blue-600"
+                  size="sm"
+                  onClick={() => openModal('workoutHistoryCreate')}
+                >
                   {t('addWorkout')}
                 </Button>
               </div>
