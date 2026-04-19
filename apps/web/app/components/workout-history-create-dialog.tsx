@@ -3,6 +3,7 @@ import { DatePicker } from '@repo/ui/components/date-picker';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
+import { NumberInput } from '@repo/ui/components/number-input';
 import { toast } from '@repo/ui/toast';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -108,7 +109,7 @@ export function WorkoutHistoryCreateDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
-      <DialogContent className="grid max-h-[90vh] max-w-[1100px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
+      <DialogContent className="grid max-h-[90vh] max-w-[1200px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
         <div className="space-y-4">
           <DialogHeader>
             <DialogTitle>{t('addWorkout')}</DialogTitle>
@@ -116,9 +117,9 @@ export function WorkoutHistoryCreateDialog() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="history-workout-name">{t('workoutName')}</Label>
               <Input
                 id="history-workout-name"
+                label={t('workoutName')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t('enterWorkoutName')}
@@ -173,10 +174,11 @@ export function WorkoutHistoryCreateDialog() {
                         />
                       </td>
                       <td className="px-2 py-2">
-                        <Input
-                          type="number"
+                        <NumberInput
                           value={exercise.weight}
-                          onChange={(e) => updateExerciseField(index, 'weight', Number(e.target.value))}
+                          onChange={(e) =>
+                            updateExerciseField(index, 'weight', Number(e.target.value))
+                          }
                           aria-label={t('weight')}
                         />
                       </td>

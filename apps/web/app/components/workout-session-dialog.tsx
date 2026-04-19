@@ -2,9 +2,9 @@ import { Button } from '@repo/ui/components/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
+import { NumberInput } from '@repo/ui/components/number-input';
 import { Textarea } from '@repo/ui/components/textarea';
 import { toast } from '@repo/ui/toast';
-import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IExercise } from '../interfaces/exercise';
@@ -15,7 +15,7 @@ import { useModalStore } from '../stores/modal-store';
 import { useTelegramStore } from '../stores/telegram-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
 import { generateWorkoutText } from '../utils/workout-text-generator';
-import { ExerciseSelector } from './exercise-selector';
+import { ExerciseListEditor } from './exercise-list-editor';
 import { WorkoutPreview } from './workout-preview';
 
 export function WorkoutSessionDialog() {
@@ -289,7 +289,7 @@ export function WorkoutSessionDialog() {
 
   return (
     <Dialog open={isOpen && !!activeModal.data} onOpenChange={closeModal}>
-      <DialogContent className="grid max-h-[90vh] max-w-[1100px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
+      <DialogContent className="grid max-h-[90vh] max-w-[1200px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
         <div className="space-y-4">
           <DialogHeader>
             <DialogTitle>{t('workoutSession')}</DialogTitle>
@@ -297,9 +297,9 @@ export function WorkoutSessionDialog() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="workout-name">{t('workoutName')}</Label>
               <Input
                 id="workout-name"
+                label={t('workoutName')}
                 value={workoutName}
                 onChange={(e) => setWorkoutName(e.target.value)}
                 placeholder={t('enterWorkoutName')}
@@ -308,9 +308,10 @@ export function WorkoutSessionDialog() {
             </div>
 
             <div>
-              <Label htmlFor="workout-description">{t('workoutDescription')}</Label>
               <Textarea
                 id="workout-description"
+                label={t('workoutDescription')}
+                rows={4}
                 value={workoutDescription}
                 onChange={(e) => setWorkoutDescription(e.target.value)}
                 placeholder={t('describeYourWorkout')}
@@ -319,10 +320,9 @@ export function WorkoutSessionDialog() {
             </div>
 
             <div>
-              <Label htmlFor="workout-body-weight">{t('bodyWeight')}</Label>
-              <Input
+              <NumberInput
                 id="workout-body-weight"
-                type="number"
+                label={t('bodyWeight')}
                 min="0"
                 value={bodyWeight}
                 onChange={(e) => {
@@ -415,84 +415,13 @@ export function WorkoutSessionDialog() {
             </div>
 
             <div className="mt-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-200 text-left text-sm font-medium text-slate-600">
-                      <th className="w-[260px] px-2 py-2">{t('exerciseName')}</th>
-                      <th className="w-24 px-2 py-2">{t('sets')}</th>
-                      <th className="w-28 px-2 py-2">{t('repetitions')}</th>
-                      <th className="w-28 px-2 py-2">{t('weight')}</th>
-                      <th className="w-14 px-2 py-2" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {workoutExercises.map((exercise, index) => (
-                      <tr key={exercise.id} className="border-b border-slate-100 align-top">
-                        <td className="w-[260px] px-2 py-2">
-                          <ExerciseSelector
-                            value={exercise.name}
-                            onChange={(nameKey) => updateExerciseField(index, 'name', nameKey)}
-                            placeholder={t('enterExerciseName')}
-                            className="w-[260px] max-w-[260px]"
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          <Input
-                            id={`sets-${index}`}
-                            type="text"
-                            value={exercise.sets}
-                            onChange={(e) => updateExerciseField(index, 'sets', e.target.value)}
-                            aria-label={t('sets')}
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          <Input
-                            id={`reps-${index}`}
-                            type="text"
-                            value={exercise.reps || ''}
-                            onChange={(e) => updateExerciseField(index, 'reps', e.target.value)}
-                            aria-label={t('repetitions')}
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          <Input
-                            id={`weight-${index}`}
-                            type="number"
-                            value={exercise.weight}
-                            onChange={(e) =>
-                              updateExerciseField(index, 'weight', Number(e.target.value))
-                            }
-                            aria-label={t('weight')}
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={() => removeExercise(index)}
-                            disabled={workoutExercises.length <= 1}
-                          >
-                            <X className="size-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <td className="px-2 py-3" colSpan={5}>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={addExercise}
-                          className="w-full border-slate-300 text-slate-700 hover:bg-slate-50"
-                        >
-                          {t('addExercise')}
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <ExerciseListEditor
+                exercises={workoutExercises}
+                onExerciseFieldChange={updateExerciseField}
+                onAddExercise={addExercise}
+                onRemoveExercise={removeExercise}
+                onReorderExercises={setWorkoutExercises}
+              />
             </div>
           </div>
         </div>

@@ -1,18 +1,43 @@
 import { Button } from '@repo/ui/components/button';
 import { CardContent } from '@repo/ui/components/card';
 import { ConfirmDialog } from '@repo/ui/components/confirm-dialog';
-import { useState } from 'react';
+import { GripVertical } from 'lucide-react';
+import { type DragEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IWorkoutTemplate } from '../interfaces/workout-template';
 import { useModalStore } from '../stores/modal-store';
 import { useWorkoutTemplateStore } from '../stores/workout-template-store';
 
+const moveTemplate = (items: IWorkoutTemplate[], fromIndex: number, toIndex: number) => {
+  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) {
+    return items;
+  }
+
+  const nextItems = [...items];
+  const [movedItem] = nextItems.splice(fromIndex, 1);
+
+  if (!movedItem) {
+    return items;
+  }
+
+  nextItems.splice(toIndex, 0, movedItem);
+  return nextItems;
+};
+
 export function WorkoutTemplatesSection() {
   const { t } = useTranslation('common');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
+  const [draggedTemplateId, setDraggedTemplateId] = useState<string | null>(null);
+  const [dropTargetTemplateId, setDropTargetTemplateId] = useState<string | null>(null);
 
-  const { templates, deleteTemplate, setCurrentTemplate, setIsEditingTemplate } =
+  const {
+    templates,
+    deleteTemplate,
+    reorderTemplates,
+    setCurrentTemplate,
+    setIsEditingTemplate,
+  } =
     useWorkoutTemplateStore();
   const { openModal } = useModalStore();
 
@@ -51,6 +76,40 @@ export function WorkoutTemplatesSection() {
     openModal('templateEditor', { template });
   };
 
+  const resetDragState = () => {
+    setDraggedTemplateId(null);
+    setDropTargetTemplateId(null);
+  };
+
+  const handleDragStart = (event: DragEvent<HTMLButtonElement>, templateId: string) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', templateId);
+    setDraggedTemplateId(templateId);
+    setDropTargetTemplateId(templateId);
+  };
+
+  const handleDragEnter = (templateId: string) => {
+    if (!draggedTemplateId || draggedTemplateId === templateId) {
+      return;
+    }
+
+    setDropTargetTemplateId(templateId);
+  };
+
+  const handleDrop = (templateId: string) => {
+    if (!draggedTemplateId || draggedTemplateId === templateId) {
+      resetDragState();
+      return;
+    }
+
+    const fromIndex = templates.findIndex((template) => template.id === draggedTemplateId);
+    const toIndex = templates.findIndex((template) => template.id === templateId);
+    const nextTemplates = moveTemplate(templates, fromIndex, toIndex);
+
+    reorderTemplates(nextTemplates);
+    resetDragState();
+  };
+
   return (
     <div className="mb-10 overflow-hidden rounded-2xl bg-white shadow-xl">
       <div className="bg-teal-600 p-6">
@@ -75,9 +134,32 @@ export function WorkoutTemplatesSection() {
             {templates.map((template) => (
               <div
                 key={template.id}
-                className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-shadow duration-300 hover:shadow-md"
+                className={[
+                  'flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-shadow duration-300 hover:shadow-md',
+                  draggedTemplateId === template.id ? 'opacity-50' : '',
+                  dropTargetTemplateId === template.id && draggedTemplateId !== template.id
+                    ? 'bg-slate-50 ring-2 ring-teal-200'
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                onDragEnter={() => handleDragEnter(template.id)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => handleDrop(template.id)}
               >
-                <h3 className="text-xl font-bold text-slate-800">{template.name}</h3>
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="text-xl font-bold text-slate-800">{template.name}</h3>
+                  <button
+                    type="button"
+                    draggable
+                    onDragStart={(event) => handleDragStart(event, template.id)}
+                    onDragEnd={resetDragState}
+                    className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 active:cursor-grabbing"
+                    aria-label={t('reorderTemplates')}
+                  >
+                    <GripVertical className="size-4" />
+                  </button>
+                </div>
                 <p className="mt-2 grow text-slate-600">
                   {template.description || t('noDescription')}
                 </p>
