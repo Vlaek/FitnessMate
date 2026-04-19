@@ -155,6 +155,9 @@
   "german": "Deutsch",
   "russian": "Russisch",
   "language": "Sprache",
+  "theme": "Thema",
+  "lightTheme": "Hell",
+  "darkTheme": "Dunkel",
   "fitnessmate": "FitnessMate",
   "createAndManageWorkoutTemplates": "Erstellen und verwalten Sie Workout-Vorlagen",
   "addNewTemplate": "Neue Vorlage hinzufügen",
@@ -183,5 +186,7 @@
   "footerDescription": "hilft Ihnen, Workouts zu erstellen, Fortschritte zu verfolgen und Berichte an Telegram zu senden.",
   "footerGithubAria": "GitHub-Profil: Vlaek",
   "showToken": "Token anzeigen",
-  "hideToken": "Token ausblenden"
+  "hideToken": "Token ausblenden",
+  "switchToDarkTheme": "Zum dunklen Thema wechseln",
+  "switchToLightTheme": "Zum hellen Thema wechseln"
 }

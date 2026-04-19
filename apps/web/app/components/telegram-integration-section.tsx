@@ -32,15 +32,15 @@ export function TelegramIntegrationSection() {
   };
 
   return (
-    <div className="mb-10 overflow-hidden rounded-2xl bg-white shadow-xl">
-      <div className="bg-blue-600 p-6">
+    <div className="mb-10 overflow-hidden rounded-2xl border border-border bg-card shadow-xl transition-colors">
+      <div className="bg-linear-to-r from-blue-600 to-cyan-500 p-6">
         <h2 className="text-2xl font-bold text-white">{t('telegramIntegration')}</h2>
         <p className="text-blue-100">{t('configureYourTelegramBotTokenToSendWorkoutReports')}</p>
       </div>
       <CardContent className="px-6 py-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <Label htmlFor="token" className="text-slate-700">
+            <Label htmlFor="token" className="text-foreground">
               {t('botToken')}
             </Label>
             <div className="relative mt-1">
@@ -50,11 +50,11 @@ export function TelegramIntegrationSection() {
                 value={telegramToken}
                 onChange={(e) => setToken(e.target.value)}
                 placeholder={t('enterYourTelegramBotToken')}
-                className="w-full rounded-lg border border-slate-300 p-3 pr-10"
+                className="w-full rounded-lg border border-border bg-background p-3 pr-10"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-500"
+                className="text-muted-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3"
                 onClick={() => setShowToken(!showToken)}
                 aria-label={showToken ? t('hideToken') : t('showToken')}
               >
@@ -70,13 +70,13 @@ export function TelegramIntegrationSection() {
               value={chatId}
               onChange={(e) => setChatId(e.target.value)}
               placeholder={t('enterTargetChatID')}
-              className="w-full rounded-lg border border-slate-300 p-3"
-              labelClassName="text-slate-700"
+              className="w-full rounded-lg border border-border bg-background p-3"
+              labelClassName="text-foreground"
             />
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-3 bg-slate-50 px-6 py-4">
+      <CardFooter className="bg-muted/40 flex flex-wrap gap-3 px-6 py-4">
         <Button
           onClick={handleSaveToken}
           className="rounded-lg bg-green-600 px-5 py-2 text-white transition-colors hover:bg-green-700"
@@ -86,7 +86,7 @@ export function TelegramIntegrationSection() {
         <Button
           variant="outline"
           onClick={handleResetToken}
-          className="rounded-lg border-red-500 px-5 py-2 text-red-600 transition-colors hover:bg-red-50"
+          className="rounded-lg border-red-500 px-5 py-2 text-red-600 transition-colors hover:bg-red-50 dark:border-red-400 dark:text-red-300"
         >
           {t('resetToken')}
         </Button>

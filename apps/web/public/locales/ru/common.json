@@ -155,6 +155,9 @@
   "german": "Немецкий",
   "russian": "Русский",
   "language": "Язык",
+  "theme": "Тема",
+  "lightTheme": "Светлая",
+  "darkTheme": "Тёмная",
   "fitnessmate": "FitnessMate",
   "createAndManageWorkoutTemplates": "Создавайте и управляйте шаблонами тренировок",
   "addNewTemplate": "Добавить новый шаблон",
@@ -183,5 +186,7 @@
   "footerDescription": "помогает создавать тренировки, отслеживать прогресс и отправлять отчеты в Telegram.",
   "footerGithubAria": "Профиль GitHub: Vlaek",
   "showToken": "Показать токен",
-  "hideToken": "Скрыть токен"
+  "hideToken": "Скрыть токен",
+  "switchToDarkTheme": "Переключиться на темную тему",
+  "switchToLightTheme": "Переключиться на светлую тему"
 }

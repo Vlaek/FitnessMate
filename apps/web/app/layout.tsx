@@ -1,9 +1,11 @@
 import { Toaster } from '@repo/ui/components/sonner';
 import '@repo/ui/globals.css';
+import './theme-overrides.css';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { AppFooter } from './components/app-footer';
 import I18nProvider from './providers/i18n-provider';
+import ThemeProvider from './providers/theme-provider';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -25,13 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <I18nProvider>
-          {children}
-          <AppFooter />
-          <Toaster />
-        </I18nProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased transition-colors`}>
+        <ThemeProvider>
+          <I18nProvider>
+            {children}
+            <AppFooter />
+            <Toaster />
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

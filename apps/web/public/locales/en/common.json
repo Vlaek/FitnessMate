@@ -155,6 +155,9 @@
   "german": "German",
   "russian": "Russian",
   "language": "Language",
+  "theme": "Theme",
+  "lightTheme": "Light",
+  "darkTheme": "Dark",
   "fitnessmate": "FitnessMate",
   "createAndManageWorkoutTemplates": "Create and manage workout templates",
   "addNewTemplate": "Add New Template",
@@ -183,5 +186,7 @@
   "footerDescription": "helps you build workout routines, track progress, and share reports with Telegram.",
   "footerGithubAria": "GitHub profile: Vlaek",
   "showToken": "Show token",
-  "hideToken": "Hide token"
+  "hideToken": "Hide token",
+  "switchToDarkTheme": "Switch to dark theme",
+  "switchToLightTheme": "Switch to light theme"
 }

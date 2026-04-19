@@ -4,7 +4,7 @@ import { ConfirmDialog } from '@repo/ui/components/confirm-dialog';
 import { GripVertical } from 'lucide-react';
 import { type DragEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IWorkoutTemplate } from '../interfaces/workout-template';
+import { type IWorkoutTemplate } from '../interfaces/workout-template';
 import { useModalStore } from '../stores/modal-store';
 import { useWorkoutTemplateStore } from '../stores/workout-template-store';
 
@@ -31,13 +31,7 @@ export function WorkoutTemplatesSection() {
   const [draggedTemplateId, setDraggedTemplateId] = useState<string | null>(null);
   const [dropTargetTemplateId, setDropTargetTemplateId] = useState<string | null>(null);
 
-  const {
-    templates,
-    deleteTemplate,
-    reorderTemplates,
-    setCurrentTemplate,
-    setIsEditingTemplate,
-  } =
+  const { templates, deleteTemplate, reorderTemplates, setCurrentTemplate, setIsEditingTemplate } =
     useWorkoutTemplateStore();
   const { openModal } = useModalStore();
 
@@ -111,8 +105,8 @@ export function WorkoutTemplatesSection() {
   };
 
   return (
-    <div className="mb-10 overflow-hidden rounded-2xl bg-white shadow-xl">
-      <div className="bg-teal-600 p-6">
+    <div className="border-border bg-card mb-10 overflow-hidden rounded-2xl border shadow-xl transition-colors">
+      <div className="bg-linear-to-r from-teal-600 to-emerald-500 p-6">
         <div className="flex flex-row items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white">{t('workoutTemplates')}</h2>
@@ -120,7 +114,7 @@ export function WorkoutTemplatesSection() {
           </div>
           <Button
             onClick={handleAddNewTemplate}
-            className="rounded-lg bg-white px-5 py-2 text-teal-600 transition-colors hover:bg-slate-100"
+            className="dark:bg-card dark:text-foreground rounded-lg bg-white px-5 py-2 text-teal-600 transition-colors hover:bg-slate-100"
           >
             {t('addNewTemplate')}
           </Button>
@@ -128,39 +122,39 @@ export function WorkoutTemplatesSection() {
       </div>
       <CardContent className="px-6 py-6">
         {templates.length === 0 ? (
-          <p className="py-8 text-center text-lg text-slate-500">{t('noTemplatesYet')}</p>
+          <p className="text-muted-foreground py-8 text-center text-lg">{t('noTemplatesYet')}</p>
         ) : (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-2">
             {templates.map((template) => (
               <div
                 key={template.id}
                 className={[
-                  'flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-shadow duration-300 hover:shadow-md',
+                  'border-border bg-card flex flex-col rounded-xl border p-5 transition-shadow duration-300 hover:shadow-md',
                   draggedTemplateId === template.id ? 'opacity-50' : '',
                   dropTargetTemplateId === template.id && draggedTemplateId !== template.id
-                    ? 'bg-slate-50 ring-2 ring-teal-200'
+                    ? 'bg-muted ring-2 ring-teal-200'
                     : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onDragEnter={() => handleDragEnter(template.id)}
+                onDragEnter={() => handleDragEnter(template.id || '')}
                 onDragOver={(event) => event.preventDefault()}
-                onDrop={() => handleDrop(template.id)}
+                onDrop={() => handleDrop(template.id || '')}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <h3 className="text-xl font-bold text-slate-800">{template.name}</h3>
+                  <h3 className="text-foreground text-xl font-bold">{template.name}</h3>
                   <button
                     type="button"
                     draggable
-                    onDragStart={(event) => handleDragStart(event, template.id)}
+                    onDragStart={(event) => handleDragStart(event, template.id || '')}
                     onDragEnd={resetDragState}
-                    className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 active:cursor-grabbing"
+                    className="text-muted-foreground hover:text-foreground flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-md transition hover:bg-slate-100 active:cursor-grabbing"
                     aria-label={t('reorderTemplates')}
                   >
                     <GripVertical className="size-4" />
                   </button>
                 </div>
-                <p className="mt-2 grow text-slate-600">
+                <p className="text-muted-foreground mt-2 grow">
                   {template.description || t('noDescription')}
                 </p>
                 <div className="mt-5 flex gap-2">
@@ -168,7 +162,7 @@ export function WorkoutTemplatesSection() {
                     size="sm"
                     variant="outline"
                     onClick={() => handleEditTemplate(template)}
-                    className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
+                    className="border-border text-foreground flex-1 hover:bg-slate-50"
                   >
                     {t('edit')}
                   </Button>

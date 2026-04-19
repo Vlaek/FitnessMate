@@ -6,7 +6,7 @@ import { NumberInput } from '@repo/ui/components/number-input';
 import { GripVertical, X } from 'lucide-react';
 import { type DragEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IExercise } from '../interfaces/exercise';
+import { type IExercise } from '../interfaces/exercise';
 import { ExerciseSelector } from './exercise-selector';
 
 type ExerciseListEditorProps = {

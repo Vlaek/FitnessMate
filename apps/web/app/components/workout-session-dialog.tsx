@@ -7,8 +7,8 @@ import { Textarea } from '@repo/ui/components/textarea';
 import { toast } from '@repo/ui/toast';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IExercise } from '../interfaces/exercise';
-import { IWorkoutTemplate } from '../interfaces/workout-template';
+import { type IExercise } from '../interfaces/exercise';
+import { type IWorkoutTemplate } from '../interfaces/workout-template';
 import { RandomImageService } from '../services/random-image-service';
 import { TelegramService } from '../services/telegram-service';
 import { useModalStore } from '../stores/modal-store';
@@ -364,234 +364,240 @@ export function WorkoutSessionDialog() {
   return (
     <>
       <Dialog open={isOpen && !!activeModal.data} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="grid max-h-[90vh] max-w-[1200px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
-        <div className="space-y-4">
-          <DialogHeader>
-            <DialogTitle>{t('workoutSession')}</DialogTitle>
-          </DialogHeader>
-
+        <DialogContent className="grid max-h-[90vh] max-w-[1200px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
           <div className="space-y-4">
-            <div>
-              <Input
-                id="workout-name"
-                label={t('workoutName')}
-                value={workoutName}
-                onChange={(e) => setWorkoutName(e.target.value)}
-                placeholder={t('enterWorkoutName')}
-                className="mt-1"
-              />
-            </div>
+            <DialogHeader>
+              <DialogTitle>{t('workoutSession')}</DialogTitle>
+            </DialogHeader>
 
-            <div>
-              <Textarea
-                id="workout-description"
-                label={t('workoutDescription')}
-                rows={4}
-                value={workoutDescription}
-                onChange={(e) => setWorkoutDescription(e.target.value)}
-                placeholder={t('describeYourWorkout')}
-                className="mt-1 min-h-25"
-              />
-            </div>
+            <div className="space-y-4">
+              <div>
+                <Input
+                  id="workout-name"
+                  label={t('workoutName')}
+                  value={workoutName}
+                  onChange={(e) => setWorkoutName(e.target.value)}
+                  placeholder={t('enterWorkoutName')}
+                  className="mt-1"
+                />
+              </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <NumberInput
-                id="workout-body-weight"
-                label={t('bodyWeight')}
-                min="0"
-                value={bodyWeight}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  if (next === '') {
-                    setBodyWeight('');
-                    return;
-                  }
-                  const numeric = Number(next);
-                  if (Number.isFinite(numeric) && numeric >= 0) {
-                    setBodyWeight(next);
-                  }
-                }}
-                placeholder={t('enterBodyWeight')}
-                className="mt-1"
-              />
+              <div>
+                <Textarea
+                  id="workout-description"
+                  label={t('workoutDescription')}
+                  rows={4}
+                  value={workoutDescription}
+                  onChange={(e) => setWorkoutDescription(e.target.value)}
+                  placeholder={t('describeYourWorkout')}
+                  className="mt-1 min-h-25"
+                />
+              </div>
 
-              <NumberInput
-                id="workout-body-fat-percentage"
-                label={t('bodyFatPercentage')}
-                min="0"
-                step="0.1"
-                value={bodyFatPercentage}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  if (next === '') {
-                    setBodyFatPercentage('');
-                    return;
-                  }
-                  const numeric = Number(next);
-                  if (Number.isFinite(numeric) && numeric >= 0) {
-                    setBodyFatPercentage(next);
-                  }
-                }}
-                placeholder={t('enterBodyFatPercentage')}
-                className="mt-1"
-              />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <NumberInput
+                  id="workout-body-weight"
+                  label={t('bodyWeight')}
+                  min="0"
+                  value={bodyWeight}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    if (next === '') {
+                      setBodyWeight('');
+                      return;
+                    }
+                    const numeric = Number(next);
+                    if (Number.isFinite(numeric) && numeric >= 0) {
+                      setBodyWeight(next);
+                    }
+                  }}
+                  placeholder={t('enterBodyWeight')}
+                  className="mt-1"
+                />
 
-              <NumberInput
-                id="workout-muscle-mass-kg"
-                label={t('muscleMassKg')}
-                min="0"
-                step="0.1"
-                value={muscleMassKg}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  if (next === '') {
-                    setMuscleMassKg('');
-                    return;
-                  }
-                  const numeric = Number(next);
-                  if (Number.isFinite(numeric) && numeric >= 0) {
-                    setMuscleMassKg(next);
-                  }
-                }}
-                placeholder={t('enterMuscleMassKg')}
-                className="mt-1"
-              />
-            </div>
+                <NumberInput
+                  id="workout-body-fat-percentage"
+                  label={t('bodyFatPercentage')}
+                  min="0"
+                  step="0.1"
+                  value={bodyFatPercentage}
+                  onChange={(e) => {
+                    const next = e.target.value;
 
-            <div className="space-y-4 pt-4">
-              <div className="ml-2 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <div className="flex items-center">
+                    if (next === '') {
+                      setBodyFatPercentage('');
+                      return;
+                    }
+
+                    const numeric = Number(next);
+
+                    if (Number.isFinite(numeric) && numeric >= 0) {
+                      setBodyFatPercentage(next);
+                    }
+                  }}
+                  placeholder={t('enterBodyFatPercentage')}
+                  className="mt-1"
+                />
+
+                <NumberInput
+                  id="workout-muscle-mass-kg"
+                  label={t('muscleMassKg')}
+                  min="0"
+                  step="0.1"
+                  value={muscleMassKg}
+                  onChange={(e) => {
+                    const next = e.target.value;
+
+                    if (next === '') {
+                      setMuscleMassKg('');
+                      return;
+                    }
+
+                    const numeric = Number(next);
+
+                    if (Number.isFinite(numeric) && numeric >= 0) {
+                      setMuscleMassKg(next);
+                    }
+                  }}
+                  placeholder={t('enterMuscleMassKg')}
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="space-y-4 pt-4">
+                <div className="ml-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="session-use-weekday-prefix"
+                      checked={useWeekdayPrefix}
+                      onChange={(e) => setUseWeekdayPrefix(e.target.checked)}
+                      className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <Label htmlFor="session-use-weekday-prefix">
+                      {t('addWeekdayPrefix')} ({getWeekdayName()})
+                    </Label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="session-use-workout-date-prefix"
+                      checked={useWorkoutDatePrefix}
+                      onChange={(e) => setUseWorkoutDatePrefix(e.target.checked)}
+                      className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <Label htmlFor="session-use-workout-date-prefix">{t('addWorkoutDate')}</Label>
+                  </div>
+                </div>
+
+                <div className="ml-2 flex items-center">
                   <input
                     type="checkbox"
-                    id="session-use-weekday-prefix"
-                    checked={useWeekdayPrefix}
-                    onChange={(e) => setUseWeekdayPrefix(e.target.checked)}
+                    id="session-use-empty-lines-between-sections"
+                    checked={useEmptyLinesBetweenSections}
+                    onChange={(e) => setUseEmptyLinesBetweenSections(e.target.checked)}
                     className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <Label htmlFor="session-use-weekday-prefix">
-                    {t('addWeekdayPrefix')} ({getWeekdayName()})
+                  <Label htmlFor="session-use-empty-lines-between-sections">
+                    {t('addEmptyLinesBetweenSections')}
                   </Label>
                 </div>
-                <div className="flex items-center">
+
+                <div className="ml-2 flex items-center">
                   <input
                     type="checkbox"
-                    id="session-use-workout-date-prefix"
-                    checked={useWorkoutDatePrefix}
-                    onChange={(e) => setUseWorkoutDatePrefix(e.target.checked)}
+                    id="session-use-total-workload"
+                    checked={useTotalWorkload}
+                    onChange={(e) => setUseTotalWorkload(e.target.checked)}
                     className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <Label htmlFor="session-use-workout-date-prefix">{t('addWorkoutDate')}</Label>
+                  <Label htmlFor="session-use-total-workload">{t('addTotalWorkload')}</Label>
+                </div>
+
+                <div className="ml-2 flex min-h-6 items-center">
+                  <input
+                    type="checkbox"
+                    id="session-use-random-image"
+                    checked={useRandomImage}
+                    onChange={(e) => void handleRandomImageToggle(e.target.checked)}
+                    className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <Label htmlFor="session-use-random-image">{t('addImage')}</Label>
+                  {useRandomImage && (
+                    <div className="ml-3 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => void handlePickAnotherImage()}
+                        className="cursor-pointer p-0 text-blue-600 hover:text-blue-700"
+                      >
+                        <span className="relative -top-[2px] text-sm underline underline-offset-2">
+                          {t('chooseAnother')}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomImageDialogOpen(true)}
+                        className="cursor-pointer p-0 text-blue-600 hover:text-blue-700"
+                      >
+                        <span className="relative -top-[2px] text-sm underline underline-offset-2">
+                          {t('addCustom')}
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="ml-2 flex items-center">
-                <input
-                  type="checkbox"
-                  id="session-use-empty-lines-between-sections"
-                  checked={useEmptyLinesBetweenSections}
-                  onChange={(e) => setUseEmptyLinesBetweenSections(e.target.checked)}
-                  className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              <div className="mt-6">
+                <ExerciseListEditor
+                  exercises={workoutExercises}
+                  onExerciseFieldChange={updateExerciseField}
+                  onAddExercise={addExercise}
+                  onRemoveExercise={removeExercise}
+                  onReorderExercises={setWorkoutExercises}
                 />
-                <Label htmlFor="session-use-empty-lines-between-sections">
-                  {t('addEmptyLinesBetweenSections')}
-                </Label>
               </div>
-
-              <div className="ml-2 flex items-center">
-                <input
-                  type="checkbox"
-                  id="session-use-total-workload"
-                  checked={useTotalWorkload}
-                  onChange={(e) => setUseTotalWorkload(e.target.checked)}
-                  className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-                <Label htmlFor="session-use-total-workload">{t('addTotalWorkload')}</Label>
-              </div>
-
-              <div className="ml-2 flex min-h-6 items-center">
-                <input
-                  type="checkbox"
-                  id="session-use-random-image"
-                  checked={useRandomImage}
-                  onChange={(e) => void handleRandomImageToggle(e.target.checked)}
-                  className="mr-2 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-                <Label htmlFor="session-use-random-image">{t('addImage')}</Label>
-                {useRandomImage && (
-                  <div className="ml-3 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => void handlePickAnotherImage()}
-                      className="cursor-pointer p-0 text-blue-600 hover:text-blue-700"
-                    >
-                      <span className="relative -top-[2px] text-sm underline underline-offset-2">
-                        {t('chooseAnother')}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsCustomImageDialogOpen(true)}
-                      className="cursor-pointer p-0 text-blue-600 hover:text-blue-700"
-                    >
-                      <span className="relative -top-[2px] text-sm underline underline-offset-2">
-                        {t('addCustom')}
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <ExerciseListEditor
-                exercises={workoutExercises}
-                onExerciseFieldChange={updateExerciseField}
-                onAddExercise={addExercise}
-                onRemoveExercise={removeExercise}
-                onReorderExercises={setWorkoutExercises}
-              />
             </div>
           </div>
-        </div>
 
-        <div className="sticky top-0 h-full max-h-[calc(100vh-16rem)] border-l border-slate-200 pl-6">
-          <h3 className="mb-4 text-lg font-medium">{t('preview')}</h3>
-          <WorkoutPreview
-            exercises={workoutExercises}
-            description={workoutDescription}
-            bodyWeight={bodyWeight}
-            bodyFatPercentage={bodyFatPercentage}
-            muscleMassKg={muscleMassKg}
-            templateName={workoutName}
-            useWeekdayPrefix={useWeekdayPrefix}
-            useWorkoutDatePrefix={useWorkoutDatePrefix}
-            useEmptyLinesBetweenSections={useEmptyLinesBetweenSections}
-            useTotalWorkload={useTotalWorkload}
-            useImage={useRandomImage}
-            imagePreviewUrl={currentImagePreviewUrl}
-          />
-          <p className="mt-2 text-xs text-slate-500">{t('previewDescription')}</p>
+          <div className="sticky top-0 h-full max-h-[calc(100vh-16rem)] border-l border-slate-200 pl-6">
+            <h3 className="mb-4 text-lg font-medium">{t('preview')}</h3>
+            <WorkoutPreview
+              exercises={workoutExercises}
+              description={workoutDescription}
+              bodyWeight={bodyWeight}
+              bodyFatPercentage={bodyFatPercentage}
+              muscleMassKg={muscleMassKg}
+              templateName={workoutName}
+              useWeekdayPrefix={useWeekdayPrefix}
+              useWorkoutDatePrefix={useWorkoutDatePrefix}
+              useEmptyLinesBetweenSections={useEmptyLinesBetweenSections}
+              useTotalWorkload={useTotalWorkload}
+              useImage={useRandomImage}
+              imagePreviewUrl={currentImagePreviewUrl}
+            />
+            <p className="mt-2 text-xs text-slate-500">{t('previewDescription')}</p>
 
-          <div className="sticky bottom-0 mt-4 space-y-2 bg-white pt-3">
-            <div className="grid grid-cols-2 gap-2">
-              <Button type="button" variant="outline" onClick={handleReset} className="w-full">
-                {t('reset')}
-              </Button>
-              <Button type="button" variant="outline" onClick={handleSave} className="w-full">
-                {t('save')}
+            <div className="sticky bottom-0 mt-4 space-y-3 pt-3">
+              <div className="grid grid-cols-2 gap-2">
+                <Button type="button" variant="outline" onClick={handleReset} className="w-full">
+                  {t('reset')}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleSave} className="w-full">
+                  {t('save')}
+                </Button>
+              </div>
+              <Button
+                type="button"
+                onClick={() => void handleSaveAndSend()}
+                className="w-full"
+                variant="default"
+              >
+                {t('saveAndSend')}
               </Button>
             </div>
-            <Button
-              type="button"
-              onClick={() => void handleSaveAndSend()}
-              className="w-full"
-              variant="default"
-            >
-              {t('saveAndSend')}
-            </Button>
           </div>
-        </div>
-      </DialogContent>
+        </DialogContent>
       </Dialog>
       <CustomImageUploadDialog
         open={isCustomImageDialogOpen}

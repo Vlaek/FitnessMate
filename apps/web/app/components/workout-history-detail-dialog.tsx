@@ -8,8 +8,8 @@ import { toast } from '@repo/ui/toast';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IExercise } from '../interfaces/exercise';
-import { IWorkoutHistory } from '../interfaces/workout-history';
+import { type IExercise } from '../interfaces/exercise';
+import { type IWorkoutHistory } from '../interfaces/workout-history';
 import { useModalStore } from '../stores/modal-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
 import { formatDateDDMMYYYY } from '../utils/workout-text-generator';
@@ -290,7 +290,7 @@ export function WorkoutHistoryDetailDialog() {
           />
           <p className="mt-2 text-xs text-slate-500">{t('historicalWorkoutPreview')}</p>
 
-          <div className="sticky bottom-0 mt-4 grid grid-cols-2 gap-2 bg-white pt-3">
+          <div className="sticky bottom-0 mt-4 grid grid-cols-2 gap-2 pt-3">
             {isEditing ? (
               <>
                 <Button

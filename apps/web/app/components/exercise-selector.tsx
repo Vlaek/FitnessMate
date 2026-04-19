@@ -1,6 +1,6 @@
 'use client';
 
-import { Combobox, Option } from '@repo/ui/components/combobox';
+import { Combobox, type Option } from '@repo/ui/components/combobox';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useExerciseCatalogStore } from '../stores/exercise-catalog-store';

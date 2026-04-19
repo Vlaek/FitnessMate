@@ -8,7 +8,7 @@ import { toast } from '@repo/ui/toast';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IExercise } from '../interfaces/exercise';
+import { type IExercise } from '../interfaces/exercise';
 import { useModalStore } from '../stores/modal-store';
 import { useWorkoutHistoryStore } from '../stores/workout-history-store';
 import { ExerciseSelector } from './exercise-selector';
@@ -218,7 +218,7 @@ export function WorkoutHistoryCreateDialog() {
             {t('workoutWillBeAddedToHistory')}
           </div>
 
-          <div className="sticky bottom-0 mt-4 grid grid-cols-2 gap-2 bg-white pt-3">
+          <div className="sticky bottom-0 mt-4 grid grid-cols-2 gap-2 pt-3">
             <Button type="button" variant="outline" onClick={closeModal} className="w-full">
               {t('cancel')}
             </Button>
