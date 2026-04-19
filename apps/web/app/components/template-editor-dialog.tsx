@@ -517,7 +517,11 @@ export function TemplateEditorDialog() {
                   <Button type="button" variant="outline" onClick={handleReset} className="w-full">
                     {t('reset')}
                   </Button>
-                  <Button type="button" onClick={handleSave} variant="default" className="w-full">
+                  <Button
+                    onClick={handleSave}
+                    variant="default"
+                    className="w-full bg-blue-500 hover:bg-blue-600"
+                  >
                     {t('saveTemplate')}
                   </Button>
                 </div>
