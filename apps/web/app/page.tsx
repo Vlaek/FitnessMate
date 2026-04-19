@@ -6,7 +6,10 @@ import { WorkoutTemplatesSection } from './components/workout-templates-section'
 
 export default function HomePage() {
   return (
-    <div className="min-h-[calc(100vh-62px)] bg-slate-50 py-8">
+    <div
+      data-testid="home-shell"
+      className="min-h-[calc(100vh-62px)] bg-background py-8 text-foreground transition-colors"
+    >
       <div className="container mx-auto max-w-6xl px-4">
         <MainHeader />
 

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { IExercise } from '../interfaces/exercise';
+import { type IExercise } from '../interfaces/exercise';
 import { generateWorkoutText } from '../utils/workout-text-generator';
 
 interface IProps {

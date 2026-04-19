@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { IExerciseCatalog } from '../interfaces/exercise';
+import { type IExerciseCatalog } from '../interfaces/exercise';
 
 interface IExerciseCatalogState {
   exercises: IExerciseCatalog[];

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { IExercise } from '../interfaces/exercise';
+import { type IExercise } from '../interfaces/exercise';
 
 interface IWorkoutHistoryEntry {
   id: string;

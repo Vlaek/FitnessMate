@@ -58,7 +58,8 @@ export function CustomImageUploadDialog({
           onDrop={(event) => {
             event.preventDefault();
             setIsDragging(false);
-            handleFileSelection(event.dataTransfer.files?.[0]);
+            const fileList = event.dataTransfer?.files;
+            handleFileSelection(fileList && fileList.length > 0 ? fileList[0] : undefined);
           }}
           className={`flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors ${
             isDragging
@@ -79,7 +80,11 @@ export function CustomImageUploadDialog({
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(event) => handleFileSelection(event.target.files?.[0])}
+            onChange={(event) => {
+              const target = event.target as HTMLInputElement;
+              const files = target.files;
+              handleFileSelection(files && files.length > 0 ? files[0] : undefined);
+            }}
           />
         </div>
       </DialogContent>

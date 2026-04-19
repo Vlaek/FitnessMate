@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { IWorkoutTemplate } from '../interfaces/workout-template';
+import { type IWorkoutTemplate } from '../interfaces/workout-template';
 
 const LEGACY_WORKOUT_TEMPLATES_KEY = 'workout_templates';
 
