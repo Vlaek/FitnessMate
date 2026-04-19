@@ -3,6 +3,7 @@ import { ConfirmDialog } from '@repo/ui/components/confirm-dialog';
 import { DatePicker } from '@repo/ui/components/date-picker';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/dialog';
 import { Input } from '@repo/ui/components/input';
+import { NumberInput } from '@repo/ui/components/number-input';
 import { toast } from '@repo/ui/toast';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -122,13 +123,11 @@ export function WorkoutHistoryDetailDialog() {
   };
 
   const previewExercises = isEditing ? editedExercises : (workoutHistory?.exercises ?? []);
-  const previewName = isEditing
-    ? editedName
-    : editedName || (workoutHistory?.templateName ?? '');
+  const previewName = isEditing ? editedName : editedName || (workoutHistory?.templateName ?? '');
 
   return (
     <Dialog open={isOpen && !!workoutHistory} onOpenChange={closeModal}>
-      <DialogContent className="grid max-h-[90vh] max-w-[1100px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
+      <DialogContent className="grid max-h-[90vh] max-w-[1200px] grid-cols-[1.5fr_1fr] gap-6 overflow-y-auto">
         <div className="space-y-4">
           <DialogHeader>
             <DialogTitle>
@@ -179,7 +178,10 @@ export function WorkoutHistoryDetailDialog() {
                     </thead>
                     <tbody>
                       {editedExercises.map((exercise, index) => (
-                        <tr key={exercise.id || index} className="border-b border-slate-100 align-top">
+                        <tr
+                          key={exercise.id || index}
+                          className="border-b border-slate-100 align-top"
+                        >
                           <td className="w-[260px] px-2 py-2">
                             <ExerciseSelector
                               value={exercise.name}
@@ -205,8 +207,7 @@ export function WorkoutHistoryDetailDialog() {
                             />
                           </td>
                           <td className="px-2 py-2">
-                            <Input
-                              type="number"
+                            <NumberInput
                               value={exercise.weight}
                               onChange={(e) =>
                                 updateExerciseField(index, 'weight', Number(e.target.value))
@@ -277,7 +278,6 @@ export function WorkoutHistoryDetailDialog() {
               </div>
             )}
           </div>
-
         </div>
 
         <div className="sticky top-0 h-full max-h-[calc(100vh-16rem)] border-l border-slate-200 pl-6">
@@ -293,7 +293,12 @@ export function WorkoutHistoryDetailDialog() {
           <div className="sticky bottom-0 mt-4 grid grid-cols-2 gap-2 bg-white pt-3">
             {isEditing ? (
               <>
-                <Button type="button" variant="outline" onClick={() => setIsEditing(false)} className="w-full">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                  className="w-full"
+                >
                   {t('cancel')}
                 </Button>
                 <Button type="button" onClick={handleSaveWorkout} className="w-full">
@@ -302,7 +307,12 @@ export function WorkoutHistoryDetailDialog() {
               </>
             ) : (
               <>
-                <Button type="button" variant="outline" onClick={() => setIsEditing(true)} className="w-full">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="w-full"
+                >
                   {t('edit')}
                 </Button>
                 <Button

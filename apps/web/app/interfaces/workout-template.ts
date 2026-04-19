@@ -5,6 +5,8 @@ export interface IWorkoutTemplate {
   name: string;
   description: string;
   bodyWeight?: string;
+  bodyFatPercentage?: string;
+  muscleMassKg?: string;
   exercises: IExercise[];
   useWeekdayPrefix?: boolean;
   useWorkoutDatePrefix?: boolean;

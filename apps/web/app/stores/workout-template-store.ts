@@ -9,6 +9,7 @@ interface IWorkoutTemplateState {
   currentTemplate: IWorkoutTemplate | null;
   isEditingTemplate: boolean;
   setTemplates: (templates: IWorkoutTemplate[]) => void;
+  reorderTemplates: (nextTemplates: IWorkoutTemplate[]) => void;
   addTemplate: (template: IWorkoutTemplate) => void;
   updateTemplate: (template: IWorkoutTemplate) => void;
   deleteTemplate: (id: string) => void;
@@ -24,6 +25,7 @@ export const useWorkoutTemplateStore = create<IWorkoutTemplateState>()(
       currentTemplate: null,
       isEditingTemplate: false,
       setTemplates: (templates) => set({ templates }),
+      reorderTemplates: (templates) => set({ templates }),
       addTemplate: (template) =>
         set((state) => ({
           templates: [...state.templates, template],

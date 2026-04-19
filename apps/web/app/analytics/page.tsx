@@ -2,8 +2,10 @@
 
 import { Button } from '@repo/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/card';
+import dayjs from 'dayjs';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CartesianGrid,
@@ -13,6 +15,7 @@ import {
   LineChart,
   Pie,
   PieChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -28,6 +31,14 @@ const AnalyticsPage = () => {
   const workoutHistory = useWorkoutHistoryStore((state) => state.history);
   const { initializeExercises, exercises } = useExerciseCatalogStore();
   const { openModal } = useModalStore();
+  const getStartOfWeek = (date: dayjs.Dayjs) => {
+    const day = date.day();
+    const diffToMonday = day === 0 ? 6 : day - 1;
+
+    return date.subtract(diffToMonday, 'day').startOf('day');
+  };
+  const [selectedWeekStart, setSelectedWeekStart] = useState(() => getStartOfWeek(dayjs()));
+  const currentWeekStart = getStartOfWeek(dayjs());
 
   useEffect(() => {
     initializeExercises();
@@ -44,6 +55,72 @@ const AnalyticsPage = () => {
       return sum + sets * reps * weight;
     }, 0),
   }));
+  const weeklyVolumeData = useMemo(() => {
+    const days = Array.from({ length: 7 }, (_, index) => {
+      const date = selectedWeekStart.add(index, 'day');
+
+      return {
+        date,
+        key: date.format('YYYY-MM-DD'),
+        label: date.format('DD.MM'),
+        name: t(date.format('dddd').toLowerCase()),
+        volume: 0,
+      };
+    });
+
+    const volumeByDate = new Map(days.map((day) => [day.key, 0]));
+
+    workoutHistory.forEach((workout) => {
+      const workoutDate = dayjs(workout.date);
+      const key = workoutDate.format('YYYY-MM-DD');
+
+      if (!volumeByDate.has(key)) {
+        return;
+      }
+
+      const totalVolume = workout.exercises.reduce((sum, exercise) => {
+        const sets = parseInt(exercise.sets) || 0;
+        const reps = parseInt(exercise.reps || '') || 1;
+        const weight = exercise.weight || 0;
+        return sum + sets * reps * weight;
+      }, 0);
+
+      volumeByDate.set(key, (volumeByDate.get(key) || 0) + totalVolume);
+    });
+
+    return days.map((day) => ({
+      label: day.label,
+      volume: volumeByDate.get(day.key) || 0,
+    }));
+  }, [selectedWeekStart, workoutHistory]);
+  const weeklyGuideLines = weeklyVolumeData.map((day) => day.label);
+  const weeklyVolumeYAxisMax = useMemo(() => {
+    const maxVolume = weeklyVolumeData.reduce((max, day) => Math.max(max, day.volume), 0);
+
+    return maxVolume === 0 ? 1 : maxVolume;
+  }, [weeklyVolumeData]);
+  const weeklyVolumeYAxisTicks = useMemo(() => {
+    if (weeklyVolumeYAxisMax === 1) {
+      return [0];
+    }
+
+    const tickStep = Math.max(1, Math.ceil(weeklyVolumeYAxisMax / 4));
+
+    return Array.from({ length: 5 }, (_, index) => index * tickStep);
+  }, [weeklyVolumeYAxisMax]);
+  const handlePreviousWeek = () => {
+    setSelectedWeekStart((current) => current.subtract(7, 'day'));
+  };
+  const handleNextWeek = () => {
+    setSelectedWeekStart((current) => {
+      const nextWeek = current.add(7, 'day');
+      return nextWeek.isAfter(currentWeekStart, 'day') ? current : nextWeek;
+    });
+  };
+  const isCurrentWeekSelected = selectedWeekStart.isSame(currentWeekStart, 'day');
+  const selectedWeekLabel = `${selectedWeekStart.format('DD.MM')} - ${selectedWeekStart
+    .add(6, 'day')
+    .format('DD.MM')}`;
 
   const muscleGroupData = (() => {
     const muscleGroups: Record<string, number> = {};
@@ -159,21 +236,67 @@ const AnalyticsPage = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('trainingVolumeOverTime')}</CardTitle>
+          <Card className={muscleGroupData.length > 0 ? undefined : 'lg:col-span-2'}>
+            <CardHeader className="space-y-0 pb-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle>{t('trainingVolumeOverTime')}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handlePreviousWeek}
+                    aria-label={t('previousWeek')}
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  <span className="min-w-[120px] text-center text-sm font-medium text-slate-600">
+                    {selectedWeekLabel}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handleNextWeek}
+                    disabled={isCurrentWeekSelected}
+                    aria-label={t('nextWeek')}
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
+                <LineChart
+                  data={weeklyVolumeData}
+                  margin={{ top: 8, right: 20, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  {weeklyGuideLines.map((dayName) => (
+                    <ReferenceLine
+                      key={dayName}
+                      x={dayName}
+                      stroke="#cbd5e1"
+                      strokeDasharray="4 4"
+                    />
+                  ))}
+                  <XAxis
+                    dataKey="label"
+                    ticks={weeklyGuideLines}
+                    interval={0}
+                    padding={{ left: 0, right: 12 }}
+                  />
+                  <YAxis
+                    domain={[0, weeklyVolumeYAxisMax]}
+                    ticks={weeklyVolumeYAxisTicks}
+                    tickFormatter={(value) => (value === 0 ? '' : String(value))}
+                  />
                   <Tooltip />
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="totalVolume"
+                    dataKey="volume"
                     stroke="#3b82f6"
                     name={t('volumeKg')}
                     strokeWidth={2}

@@ -57,7 +57,11 @@ export class TelegramService {
     }
   }
 
-  static async sendPhoto(imagePath: string, chatId: string, caption: string): Promise<boolean> {
+  static async sendPhoto(
+    imageSource: string | File,
+    chatId: string,
+    caption: string,
+  ): Promise<boolean> {
     const token = this.getToken();
 
     if (!token) {
@@ -66,15 +70,24 @@ export class TelegramService {
     }
 
     try {
-      // First check if the image path is accessible
-      const imageResponse = await fetch(imagePath);
-      if (!imageResponse.ok) {
-        console.error(`Failed to fetch image from ${imagePath}, status: ${imageResponse.status}`);
-        return false;
-      }
+      let imageBlob: Blob;
+      let fileName: string;
 
-      const imageBlob = await imageResponse.blob();
-      const fileName = imagePath.split('/').pop() || 'image.jpg';
+      if (imageSource instanceof File) {
+        imageBlob = imageSource;
+        fileName = imageSource.name || 'image.jpg';
+      } else {
+        const imageResponse = await fetch(imageSource);
+        if (!imageResponse.ok) {
+          console.error(
+            `Failed to fetch image from ${imageSource}, status: ${imageResponse.status}`,
+          );
+          return false;
+        }
+
+        imageBlob = await imageResponse.blob();
+        fileName = imageSource.split('/').pop() || 'image.jpg';
+      }
 
       const formData = new FormData();
       formData.append('chat_id', chatId);

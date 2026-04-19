@@ -63,16 +63,15 @@ export function TelegramIntegrationSection() {
             </div>
           </div>
           <div>
-            <Label htmlFor="chatId" className="text-slate-700">
-              {t('chatID')}
-            </Label>
             <Input
               id="chatId"
               type="text"
+              label={t('chatID')}
               value={chatId}
               onChange={(e) => setChatId(e.target.value)}
               placeholder={t('enterTargetChatID')}
-              className="mt-1 w-full rounded-lg border border-slate-300 p-3"
+              className="w-full rounded-lg border border-slate-300 p-3"
+              labelClassName="text-slate-700"
             />
           </div>
         </div>
